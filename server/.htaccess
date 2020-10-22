@@ -1,0 +1,2 @@
+RewriteEngine On
+RewriteRule ^recursos/(.*) index.php?recurso=$1&%{QUERY_STRING} [L]

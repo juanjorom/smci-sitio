@@ -1,0 +1,4 @@
+GET
+/api/index.php
+GET
+/api/index.php

@@ -3,14 +3,16 @@ import axios from 'axios'
 const state = {
     key: null,
     user: null,
-    host: null,
+    host: "http://smci.com.mx/api/recursos",
     sending: false,
     sucess: false,
     arbol: null,
     password: null,
     hostList: [],
     usersList:[],
-    mensaje: "Control Bus"
+    mensaje: "Control Bus",
+    rol: "",
+    permisos: []
 }
 
 const getters = {
@@ -19,9 +21,6 @@ const getters = {
     },
     getUser: state => {
         return state.user
-    },
-    getHost: state => {
-        return state.host
     },
     getSending: state =>{
         return state.sending
@@ -41,6 +40,12 @@ const getters = {
     getHostList(){
         return []
     },
+    getRol: state => {
+        return  state.rol
+    },
+    getPermisos: state => {
+        return  state.rol
+    },
 }
 
 const mutations = {
@@ -51,9 +56,6 @@ const mutations = {
         //await idb.addUser({user:ojet})
         //jdb.writeUser(ojet)
         state.user=ojet.user
-    },
-    setHost(state, host){
-        state.host=host
     },
     setMensaje(state, mensaje){
         state.mensaje= mensaje
@@ -66,6 +68,12 @@ const mutations = {
     },
     setArbol(state, arbol){
         state.arbol= arbol
+    },
+    setRol(state, rol){
+        state.rol = rol
+    },
+    setPermisos(state, permisos){
+        state.permisos = permisos
     }
 }
 
@@ -77,21 +85,15 @@ const actions = {
             alert('Error al logear')
         }else{
             commit('setUser', form.user)
-            commit('setHost', form.server)
             commit('setMensaje', "Hola "+form.user)
-            var grupos = await dispatch('pedirDatos','groups')
-            var cars = await dispatch('pedirDatos','devices')
-            rootState.carros.carros = cars.data.data
-            rootState.carros.arboles = grupos.data.data
-            if(grupos!=undefined & cars!=undefined){
-                commit('setArbol', await dispatch('obtenerArbol',{
-                     raiz:grupos.data.data[0].groupid, 
-                     grup: grupos.data.data, 
-                     cars: cars.data.data}))
+            var datos = await axios.get(rootState.logdata.host + "/getUser"+"?token="+rootState.logdata.key)
+            if(datos.data.mensaje=="ok")
+            {
+                commit('setMensaje', "Hola "+datos.data.data.nombre)
+                commit('setRol', datos.data.data.rol)
                 commit('setSucess', true)
-                
             }
-            dispatch('sock/conectarSocket', state.host, {root:true})
+            
         }
         commit('setSending', false)
         
@@ -136,18 +138,18 @@ const actions = {
 
     async pedirDatos({state},arbol){
         try {
-            const response = await axios.get('http://'+state.host+':12056/api/v1/basic/'+arbol+'?key='+state.key)
+            const response = await axios.get(state.host+arbol+'?key='+state.key)
             return response
         } catch (error) {
             alert(error)
         }
     },
-    async verify({commit},form ){
+    async verify({commit, state},form ){
         var exito
         try {
-            const response =await axios.get('http://'+form.server+':12056/api/v1/basic/key?username='+form.user+'&password='+form.password)
-            if(response.data.data.key!=""){
-                commit('setKey', response.data.data.key)
+            const response =await axios.post(state.host+"/login", {nickname:form.user,password:form.password})
+            if(response.data.mensaje=="ok"){
+                commit('setKey', response.data.token)
                 exito= true
             }else{
                 exito = false

@@ -1,6 +1,11 @@
 <template>
   <v-container>
-      <v-col></v-col>
+    <v-row>
+      <!--Vista de Recaudacion-->
+    </v-row>
+    <v-row>
+      <!--Vista de Accesos directos-->
+    </v-row>
   </v-container>
 </template>
 

@@ -8,6 +8,7 @@ import Recorrido from '@/views/Recorrido'
 import Ubicacion from '@/views/Ubicacion'
 import Configuracion from '@/views/Configuracion'
 import Roles from '@/views/Roles'
+import Boleteras from '@/views/AddBoletera'
 
 Vue.use(Router)
 
@@ -50,8 +51,12 @@ const routes= [
         path: "/configuracion",
         name: "configuracion",
         component: Configuracion
+    },
+    {
+        path: "/agregarBoleteras",
+        name: "agregarBoleteras",
+        component: Boleteras
     }
-    
 ]
 
 const router= new Router({

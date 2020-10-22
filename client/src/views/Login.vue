@@ -10,7 +10,7 @@
                             </v-card-title>
                             <v-card-text>
                                 <v-form ref="form">
-                                    <v-text-field v-model="form.user" ref="user" type="email" label="Usuario" :error-messages="getErrors('user')">
+                                    <v-text-field v-model="form.user" ref="user" type="text" label="Usuario" :error-messages="getErrors('user')">
                                     </v-text-field>
                                     <v-text-field v-model="form.password" ref="password" type="password" label="Contraseña" :error-messages="getErrors('password')">
                                     </v-text-field>
@@ -32,8 +32,7 @@
 import { mapGetters, mapActions } from 'vuex'
 import { validationMixin } from 'vuelidate'
 import {
-    required,
-    email
+    required
   } from 'vuelidate/lib/validators'
 export default {
     name: 'login',
@@ -54,8 +53,7 @@ export default {
     validations: {
         form:{
             user: {
-                required,
-                email,
+                required
             },
             password: {
                 required,
@@ -81,7 +79,7 @@ export default {
             if (!this.$v.$invalid) {
                 await this.log(this.form)
                 if(this.succes){
-                    this.$router.push('real')
+                    this.$router.push('dashboard')
                 }
             }
         }

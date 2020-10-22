@@ -15,7 +15,6 @@
 </template>
 
 <script>
-//import {LMap, LTileLayer } from 'vue2-leaflet'
 import {LMap, LTileLayer, LMarker, LTooltip, LControl} from 'vue2-leaflet'
 import { mapGetters } from 'vuex';
 import L from 'leaflet';

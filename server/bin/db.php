@@ -42,12 +42,32 @@
             }
         }
 
+        function ejecutar_consulta_multiple($QUERY)
+        {
+            $result = $this->CONNECTION->query($QUERY);
+            if($result===true){
+                return true;
+            }else if($result){
+                
+                while($retorno = mysqli_fetch_array($result))
+                {
+                    $final[] = $retorno;
+                }
+                return $final;
+            }
+            return false;
+        }
+
         function ejecutar_consulta($QUERY)
         {
             $result = $this->CONNECTION->query($QUERY);
-            $retorno = mysqli_fetch_array($result);
-            $result->close();
-            return $retorno;
+            if($result===true){
+                return true;
+            }else if($result){
+                $retorno = mysqli_fetch_array($result);
+                return $retorno;
+            }
+            return false;
         }
 
         function close_database()
