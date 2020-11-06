@@ -47,7 +47,8 @@ export default {
         ...mapGetters('logdata',{
             sending: 'getSending',
             getUsers: 'getUsersList',
-            succes: 'getSucess'
+            succes: 'getSucess',
+            rol: 'getRol'
         })
     },
     validations: {

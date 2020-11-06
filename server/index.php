@@ -1,11 +1,16 @@
 <?php
     $GLOBALS['SYSTEM_PATH'] = "/";
-    
+   
     require_once("./bin/db.php");
     require_once("./conf/conf.php");
     require_once("./funciones.php");
     include_once("./bin/tools.php");
-
+    include_once("./bin/log.php");
+    $GLOBALS['LOG']['DB'] = new Log("./log/DB-".date("Y-m-d").".txt" );
+    $GLOBALS['LOG']['Sesion'] = new Log("./log/Sesion-".date("Y-m-d").".txt");
+    $GLOBALS['LOG']['Usuarios'] = new Log("./log/Usuarios-".date("Y-m-d").".txt");
+    $GLOBALS['LOG']['Peticiones'] = new Log("./log/Peticiones-".date("Y-m-d").".txt");
+    
     $ruta = $_GET["token"];
     
     $recurso= $_GET['recurso'];
@@ -22,6 +27,7 @@
 
     fclose($file);   
 
+    $GLOBALS['LOG']['Peticiones']->write("Peticion por metodo " .$metodo ." al recurso ". $recurso);
     switch ($metodo)
     {
         case "POST":
@@ -36,6 +42,15 @@
                 break;
                 case "validarNickname":
                     $RESPUESTA = validar_nickname($datos);
+                break;
+                case "addBoletera":
+                    $RESPUESTA = add_boletera($datos);
+                break;
+                case "verify":
+                    $RESPUESTA = verificar_password($datos);
+                break;
+                case "openLap":
+                    $RESPUESTA = abrir_vuelta($datos);
                 break;
                 default:
                     $RESPUESTA= Array("mensaje" => "Recurso no existe");
@@ -58,7 +73,22 @@
                 case "getVersion":
                     $RESPUESTA = check_version($_GET['token']);
                 break;
-                default:
+                case "getAllBoleteras":
+                    $RESPUESTA = get_all_boleteras($_GET['token']);
+                break;
+                case "getAllPermisionarios":
+                    $RESPUESTA = get_permisionarios($_GET['token']);
+                break;
+                case "getAllUnidades":
+                    $RESPUESTA = get_all_unidades($_GET['token']);
+                break;
+                case "getAllRutas":
+                    $RESPUESTA = get_all_rutas($_GET['token']);
+                break;
+                case "getAllOpenLaps":
+                    $RESPUESTA = get_all_vueltas_abiertas($_GET['token']);
+                break;
+                default;
                     $RESPUESTA= Array("mensaje" => "Recurso no existe");
                 break;
             }
@@ -73,6 +103,15 @@
                 case "updateVersion":
                     $RESPUESTA = update_version($datos);
                 break;
+                case "updatePassword":
+                    $RESPUESTA = update_password($datos);
+                break;
+                case "closeSesion":
+                    $RESPUESTA = cerrar_sesion($datos);
+                break;
+                case "closeLap":
+                    $RESPUESTA = close_lap($datos);
+                break;
                 default:
                     $RESPUESTA= Array("mensaje" => "Recurso no existe");
                 break;
@@ -82,8 +121,11 @@
         case "DELETE":
             switch ($recurso)
             {
-                case "deleteUSer":
-                    $RESPUESTA = delete_user($datos);
+                case "deleteUser":
+                    $RESPUESTA = delete_user($_GET['token'],$_GET['id']);
+                break;
+                case "deleteBoletera":
+                    $RESPUESTA = delete_boletera($_GET['token'],$_GET['codigo']);
                 break;
                 default:
                     $RESPUESTA= Array("mensaje" => "Recurso no existe");

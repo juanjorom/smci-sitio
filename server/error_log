@@ -1221,3 +1221,106 @@ Stack trace:
   thrown in /home/smcicomm/public_html/api/bin/db.php on line 61
 [22-Oct-2020 11:55:22 America/Mexico_City] PHP Warning:  include_once(./app/caja.php): failed to open stream: No such file or directory in /home/smcicomm/public_html/api/funciones.php on line 4
 [22-Oct-2020 11:55:22 America/Mexico_City] PHP Warning:  include_once(): Failed opening './app/caja.php' for inclusion (include_path='.:/opt/cpanel/ea-php72/root/usr/share/pear') in /home/smcicomm/public_html/api/funciones.php on line 4
+[23-Oct-2020 11:00:35 America/Mexico_City] PHP Fatal error:  Uncaught Error: Call to undefined function validar_parametros_get() in /home/smcicomm/public_html/api/app/users.php:12
+Stack trace:
+#0 /home/smcicomm/public_html/api/index.php(50): get_user('eyJpZCI6ICIxIiw...')
+#1 {main}
+  thrown in /home/smcicomm/public_html/api/app/users.php on line 12
+[23-Oct-2020 11:00:39 America/Mexico_City] PHP Fatal error:  Uncaught Error: Call to undefined function validar_parametros_get() in /home/smcicomm/public_html/api/app/users.php:12
+Stack trace:
+#0 /home/smcicomm/public_html/api/index.php(50): get_user('eyJpZCI6ICIxIiw...')
+#1 {main}
+  thrown in /home/smcicomm/public_html/api/app/users.php on line 12
+[23-Oct-2020 11:01:02 America/Mexico_City] PHP Fatal error:  Uncaught Error: Call to undefined function validar_parametros_get() in /home/smcicomm/public_html/api/app/users.php:12
+Stack trace:
+#0 /home/smcicomm/public_html/api/index.php(50): get_user('eyJpZCI6ICIxIiw...')
+#1 {main}
+  thrown in /home/smcicomm/public_html/api/app/users.php on line 12
+[23-Oct-2020 11:04:20 America/Mexico_City] PHP Fatal error:  Uncaught Error: Call to undefined function validar_parametros_get() in /home/smcicomm/public_html/api/app/users.php:12
+Stack trace:
+#0 /home/smcicomm/public_html/api/index.php(50): get_user('eyJpZCI6ICIxIiw...')
+#1 {main}
+  thrown in /home/smcicomm/public_html/api/app/users.php on line 12
+[23-Oct-2020 11:24:16 America/Mexico_City] PHP Warning:  Invalid argument supplied for foreach() in /home/smcicomm/public_html/api/app/users.php on line 229
+[23-Oct-2020 11:24:18 America/Mexico_City] PHP Warning:  Invalid argument supplied for foreach() in /home/smcicomm/public_html/api/app/users.php on line 229
+[23-Oct-2020 16:25:01 America/Mexico_City] PHP Warning:  include_once(./bin/log.php): failed to open stream: No such file or directory in /home/smcicomm/public_html/api/index.php on line 8
+[23-Oct-2020 16:25:01 America/Mexico_City] PHP Warning:  include_once(): Failed opening './bin/log.php' for inclusion (include_path='.:/opt/cpanel/ea-php72/root/usr/share/pear') in /home/smcicomm/public_html/api/index.php on line 8
+[23-Oct-2020 16:25:01 America/Mexico_City] PHP Fatal error:  Uncaught Error: Class 'Log' not found in /home/smcicomm/public_html/api/index.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/smcicomm/public_html/api/index.php on line 9
+[23-Oct-2020 16:27:15 America/Mexico_City] PHP Warning:  include_once(./bin/log.php): failed to open stream: No such file or directory in /home/smcicomm/public_html/api/index.php on line 8
+[23-Oct-2020 16:27:15 America/Mexico_City] PHP Warning:  include_once(): Failed opening './bin/log.php' for inclusion (include_path='.:/opt/cpanel/ea-php72/root/usr/share/pear') in /home/smcicomm/public_html/api/index.php on line 8
+[23-Oct-2020 16:27:15 America/Mexico_City] PHP Fatal error:  Uncaught Error: Class 'Log' not found in /home/smcicomm/public_html/api/index.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/smcicomm/public_html/api/index.php on line 9
+[23-Oct-2020 16:27:17 America/Mexico_City] PHP Warning:  include_once(./bin/log.php): failed to open stream: No such file or directory in /home/smcicomm/public_html/api/index.php on line 8
+[23-Oct-2020 16:27:17 America/Mexico_City] PHP Warning:  include_once(): Failed opening './bin/log.php' for inclusion (include_path='.:/opt/cpanel/ea-php72/root/usr/share/pear') in /home/smcicomm/public_html/api/index.php on line 8
+[23-Oct-2020 16:27:17 America/Mexico_City] PHP Fatal error:  Uncaught Error: Class 'Log' not found in /home/smcicomm/public_html/api/index.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/smcicomm/public_html/api/index.php on line 9
+[23-Oct-2020 16:27:19 America/Mexico_City] PHP Warning:  include_once(./bin/log.php): failed to open stream: No such file or directory in /home/smcicomm/public_html/api/index.php on line 8
+[23-Oct-2020 16:27:19 America/Mexico_City] PHP Warning:  include_once(): Failed opening './bin/log.php' for inclusion (include_path='.:/opt/cpanel/ea-php72/root/usr/share/pear') in /home/smcicomm/public_html/api/index.php on line 8
+[23-Oct-2020 16:27:19 America/Mexico_City] PHP Fatal error:  Uncaught Error: Class 'Log' not found in /home/smcicomm/public_html/api/index.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/smcicomm/public_html/api/index.php on line 9
+[23-Oct-2020 16:27:44 America/Mexico_City] PHP Warning:  include_once(./bin/log.php): failed to open stream: No such file or directory in /home/smcicomm/public_html/api/index.php on line 8
+[23-Oct-2020 16:27:44 America/Mexico_City] PHP Warning:  include_once(): Failed opening './bin/log.php' for inclusion (include_path='.:/opt/cpanel/ea-php72/root/usr/share/pear') in /home/smcicomm/public_html/api/index.php on line 8
+[23-Oct-2020 16:27:44 America/Mexico_City] PHP Fatal error:  Uncaught Error: Class 'Log' not found in /home/smcicomm/public_html/api/index.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/smcicomm/public_html/api/index.php on line 9
+[23-Oct-2020 16:27:55 America/Mexico_City] PHP Warning:  include_once(./bin/log.php): failed to open stream: No such file or directory in /home/smcicomm/public_html/api/index.php on line 8
+[23-Oct-2020 16:27:55 America/Mexico_City] PHP Warning:  include_once(): Failed opening './bin/log.php' for inclusion (include_path='.:/opt/cpanel/ea-php72/root/usr/share/pear') in /home/smcicomm/public_html/api/index.php on line 8
+[23-Oct-2020 16:27:55 America/Mexico_City] PHP Fatal error:  Uncaught Error: Class 'Log' not found in /home/smcicomm/public_html/api/index.php:9
+Stack trace:
+#0 {main}
+  thrown in /home/smcicomm/public_html/api/index.php on line 9
+[23-Oct-2020 16:52:44 America/Mexico_City] PHP Warning:  Invalid argument supplied for foreach() in /home/smcicomm/public_html/api/app/users.php on line 258
+[23-Oct-2020 16:52:46 America/Mexico_City] PHP Warning:  Invalid argument supplied for foreach() in /home/smcicomm/public_html/api/app/users.php on line 258
+[23-Oct-2020 16:52:51 America/Mexico_City] PHP Warning:  Invalid argument supplied for foreach() in /home/smcicomm/public_html/api/app/users.php on line 258
+[26-Oct-2020 17:42:49 America/Mexico_City] PHP Warning:  fwrite() expects parameter 3 to be integer, string given in /home/smcicomm/public_html/api/bin/log.php on line 47
+[26-Oct-2020 17:42:50 America/Mexico_City] PHP Warning:  explode() expects parameter 2 to be string, object given in /home/smcicomm/public_html/api/bin/tools.php on line 40
+[26-Oct-2020 17:54:33 America/Mexico_City] PHP Warning:  explode() expects parameter 2 to be string, object given in /home/smcicomm/public_html/api/bin/tools.php on line 40
+[26-Oct-2020 18:05:41 America/Mexico_City] PHP Recoverable fatal error:  Object of class stdClass could not be converted to string in /home/smcicomm/public_html/api/app/caja.php on line 18
+[29-Oct-2020 18:25:56 America/Mexico_City] PHP Warning:  Invalid argument supplied for foreach() in /home/smcicomm/public_html/api/app/users.php on line 258
+[29-Oct-2020 18:26:44 America/Mexico_City] PHP Warning:  Invalid argument supplied for foreach() in /home/smcicomm/public_html/api/bin/tools.php on line 115
+[29-Oct-2020 18:26:44 America/Mexico_City] PHP Warning:  Invalid argument supplied for foreach() in /home/smcicomm/public_html/api/app/users.php on line 258
+[29-Oct-2020 18:27:36 America/Mexico_City] PHP Warning:  Invalid argument supplied for foreach() in /home/smcicomm/public_html/api/bin/tools.php on line 115
+[29-Oct-2020 18:27:36 America/Mexico_City] PHP Warning:  Invalid argument supplied for foreach() in /home/smcicomm/public_html/api/app/users.php on line 258
+[29-Oct-2020 18:29:58 America/Mexico_City] PHP Warning:  Invalid argument supplied for foreach() in /home/smcicomm/public_html/api/bin/tools.php on line 115
+[29-Oct-2020 18:31:51 America/Mexico_City] PHP Warning:  Invalid argument supplied for foreach() in /home/smcicomm/public_html/api/bin/tools.php on line 115
+[29-Oct-2020 18:36:20 America/Mexico_City] PHP Parse error:  syntax error, unexpected '}', expecting ';' in /home/smcicomm/public_html/api/app/unidades.php on line 28
+[29-Oct-2020 18:36:21 America/Mexico_City] PHP Parse error:  syntax error, unexpected '}', expecting ';' in /home/smcicomm/public_html/api/app/unidades.php on line 28
+[29-Oct-2020 18:36:21 America/Mexico_City] PHP Parse error:  syntax error, unexpected '}', expecting ';' in /home/smcicomm/public_html/api/app/unidades.php on line 28
+[29-Oct-2020 18:36:40 America/Mexico_City] PHP Parse error:  syntax error, unexpected '}', expecting ';' in /home/smcicomm/public_html/api/app/unidades.php on line 28
+[29-Oct-2020 18:37:28 America/Mexico_City] PHP Parse error:  syntax error, unexpected '}', expecting ';' in /home/smcicomm/public_html/api/app/unidades.php on line 28
+[29-Oct-2020 18:37:28 America/Mexico_City] PHP Parse error:  syntax error, unexpected '}', expecting ';' in /home/smcicomm/public_html/api/app/unidades.php on line 28
+[30-Oct-2020 14:27:42 America/Mexico_City] PHP Warning:  Invalid argument supplied for foreach() in /home/smcicomm/public_html/api/app/users.php on line 258
+[30-Oct-2020 14:45:06 America/Mexico_City] PHP Warning:  Invalid argument supplied for foreach() in /home/smcicomm/public_html/api/app/users.php on line 258
+[30-Oct-2020 19:33:37 America/Mexico_City] PHP Fatal error:  Uncaught Error: Call to undefined method mysqli::insert_id() in /home/smcicomm/public_html/api/bin/db.php:82
+Stack trace:
+#0 /home/smcicomm/public_html/api/app/caja.php(137): DB->id()
+#1 /home/smcicomm/public_html/api/index.php(53): abrir_vuelta(Object(stdClass))
+#2 {main}
+  thrown in /home/smcicomm/public_html/api/bin/db.php on line 82
+[02-Nov-2020 13:21:22 America/Mexico_City] PHP Warning:  mysqli::__construct(): php_network_getaddresses: getaddrinfo failed: Name or service not known in /home/smcicomm/public_html/api/bin/db.php on line 33
+[02-Nov-2020 13:21:22 America/Mexico_City] PHP Warning:  mysqli::__construct(): (HY000/2002): php_network_getaddresses: getaddrinfo failed: Name or service not known in /home/smcicomm/public_html/api/bin/db.php on line 33
+[02-Nov-2020 13:21:22 America/Mexico_City] PHP Warning:  mysqli::__construct(): php_network_getaddresses: getaddrinfo failed: Name or service not known in /home/smcicomm/public_html/api/bin/db.php on line 33
+[02-Nov-2020 13:21:22 America/Mexico_City] PHP Warning:  mysqli::__construct(): (HY000/2002): php_network_getaddresses: getaddrinfo failed: Name or service not known in /home/smcicomm/public_html/api/bin/db.php on line 33
+[02-Nov-2020 13:21:22 America/Mexico_City] PHP Warning:  mysqli::query(): Couldn't fetch mysqli in /home/smcicomm/public_html/api/bin/db.php on line 70
+[02-Nov-2020 13:21:29 America/Mexico_City] PHP Warning:  mysqli::__construct(): php_network_getaddresses: getaddrinfo failed: Name or service not known in /home/smcicomm/public_html/api/bin/db.php on line 33
+[02-Nov-2020 13:21:29 America/Mexico_City] PHP Warning:  mysqli::__construct(): (HY000/2002): php_network_getaddresses: getaddrinfo failed: Name or service not known in /home/smcicomm/public_html/api/bin/db.php on line 33
+[02-Nov-2020 13:21:29 America/Mexico_City] PHP Warning:  mysqli::query(): Couldn't fetch mysqli in /home/smcicomm/public_html/api/bin/db.php on line 70
+[02-Nov-2020 13:21:39 America/Mexico_City] PHP Warning:  mysqli::__construct(): php_network_getaddresses: getaddrinfo failed: Name or service not known in /home/smcicomm/public_html/api/bin/db.php on line 33
+[02-Nov-2020 13:21:39 America/Mexico_City] PHP Warning:  mysqli::__construct(): (HY000/2002): php_network_getaddresses: getaddrinfo failed: Name or service not known in /home/smcicomm/public_html/api/bin/db.php on line 33
+[02-Nov-2020 13:21:39 America/Mexico_City] PHP Warning:  mysqli::query(): Couldn't fetch mysqli in /home/smcicomm/public_html/api/bin/db.php on line 70
+[05-Nov-2020 15:48:31 America/Mexico_City] PHP Fatal error:  Uncaught Error: Cannot use object of type stdClass as array in /home/smcicomm/public_html/api/app/caja.php:216
+Stack trace:
+#0 /home/smcicomm/public_html/api/index.php(113): close_lap(Object(stdClass))
+#1 {main}
+  thrown in /home/smcicomm/public_html/api/app/caja.php on line 216
+[05-Nov-2020 15:50:49 America/Mexico_City] PHP Recoverable fatal error:  Object of class stdClass could not be converted to string in /home/smcicomm/public_html/api/app/caja.php on line 216

@@ -25,11 +25,11 @@
     <v-navigation-drawer v-if="logeado" v-model="mostrar" app clipped>
       <v-list>
         <v-list-item><v-btn text to="/dashboard">Dashboard</v-btn> </v-list-item>
-        <v-list-item><v-btn text to="/roles">Roles</v-btn></v-list-item>
-        <v-list-item><v-btn text to="/papeleta">Papeleta</v-btn></v-list-item>
+        <v-list-item><v-btn text to="/caja">Caja</v-btn></v-list-item>
+        <!--<v-list-item><v-btn text to="/papeleta">Papeleta</v-btn></v-list-item>
         <v-list-item><v-btn text to="/ubicacion">Ubicacion</v-btn></v-list-item>
-        <v-list-item><v-btn text to="/recorrido">Recorrido</v-btn></v-list-item>
-        <v-list-item><v-btn text to="/agregarBoleteras">Boletera</v-btn></v-list-item>
+        <v-list-item><v-btn text to="/recorrido">Recorrido</v-btn></v-list-item>-->
+        <v-list-item><v-btn text to="/boleteras">Boletera</v-btn></v-list-item>
       </v-list>
     </v-navigation-drawer>
     <v-main>

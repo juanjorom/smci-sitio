@@ -42,6 +42,13 @@
             }
         }
 
+        /**
+         * Funcion para ejecutar un query del que se espera mas de una fila
+         * 
+         * @param String $QUERY Query que se ejecutar en la base de datos
+         * @return Array  Un array de dos dimensiones con los datos solicitados
+         * 
+         */
         function ejecutar_consulta_multiple($QUERY)
         {
             $result = $this->CONNECTION->query($QUERY);
@@ -68,6 +75,11 @@
                 return $retorno;
             }
             return false;
+        }
+
+        function id()
+        {
+            return $this->CONNECTION->insert_id;
         }
 
         function close_database()

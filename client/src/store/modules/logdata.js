@@ -159,6 +159,19 @@ const actions = {
         }
         return exito
     },
+    async validarPassword({state}, password){
+        try {
+            var response = await axios.post(state.host+"/verify", {token: state.key, password: password})
+            if(response.data.mensaje=="ok")
+            {
+                return true
+            }
+            return false
+        }
+        catch{
+            return false
+        }
+    }
 
 }
 

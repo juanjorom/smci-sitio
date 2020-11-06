@@ -16,9 +16,9 @@
         $valores= validar_token($data);
         if($valores)
         {
-            $orden = $GLOBALS['DB']->ejecutar_consulta("SELECT USUARIOS_NOMBRE, USUARIOS_PASSWORD_HISTORIAL, ROL_DESCRIPCION FROM usuario_usuarios INNER JOIN usuario_rol ON ROL_ID=USUARIOS_TIPO WHERE USUARIOS_ID={$valores['id']} AND USUARIOS_ACTIVO=1");
+            $orden = $GLOBALS['DB']->ejecutar_consulta("SELECT USUARIOS_ID, USUARIOS_NOMBRE, USUARIOS_PASSWORD_HISTORIAL, ROL_DESCRIPCION FROM usuario_usuarios INNER JOIN usuario_rol ON ROL_ID=USUARIOS_TIPO WHERE USUARIOS_ID={$valores['id']} AND USUARIOS_ACTIVO=1");
             if($orden){
-                return Array("mensaje" => "ok", "data" => Array( "nombre" => $orden['USUARIOS_NOMBRE'], "password" => $orden['USUARIOS_PASSWORD_HISTORIAL'] ,"rol" => $orden['ROL_DESCRIPCION']), "token" => $data);
+                return Array("mensaje" => "ok", "data" => Array( "id"=> $orden['USUARIOS_ID'], "nombre" => $orden['USUARIOS_NOMBRE'], "password" => $orden['USUARIOS_PASSWORD_HISTORIAL'] ,"rol" => $orden['ROL_DESCRIPCION']));
             }
             return Array("mensaje" => "error interno");
         }
@@ -110,7 +110,7 @@
                 {
                     return Array("mensaje" => "ok");
                 }
-                return Array("mensaje" => "error");
+                return Array("mensaje" => "No disponible");
             }
         }
         return Array("mensaje" => "error");
@@ -127,19 +127,47 @@
     function get_all_users($token)
     {
         if(!validar_parametros_get([$token]))
+        {
+            return Array("mensaje" => "error");
+        }
         $validacion = validar_token($token);
         if($validacion)
         {
-            $permiso = $GLOBALS["DB"]->ejecutar_consulta("SELECT USUARIOS_TIPO FROM usuario_usuarios WHERE USUARIOS_ID = {$validacion['id']} AND USUARIOS_ACTIVO=1");
+            $permiso = $GLOBALS["DB"]->ejecutar_consulta("SELECT USUARIOS_TIPO FROM usuario_usuarios WHERE USUARIOS_ID = {$validacion['id']} AND USUARIOS_ACTIVO = 1");
             if($permiso["USUARIOS_TIPO"]==1 || $permiso["USUARIOS_TIPO"]==2)
             {
-                $tipo = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT USUARIOS_ID AS id, USUARIOS_NICKNAME AS nickname, USUARIOS_NOMBRE AS nombre, USUARIOS_PASSWORD_HISTORIAL AS pass, ROL_DESCRIPCION AS tipo FROM usuario_usuarios INNER JOIN usuario_rol ON ROL_ID=USUARIOS_TIPO WHERE USUARIOS_TIPO > 1");
+                $tipo = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT USUARIOS_ID AS id, USUARIOS_NICKNAME AS nickname, USUARIOS_NOMBRE AS nombre, USUARIOS_PASSWORD_HISTORIAL AS pass, ROL_DESCRIPCION AS tipo FROM usuario_usuarios INNER JOIN usuario_rol ON ROL_ID=USUARIOS_TIPO WHERE USUARIOS_TIPO > 1 AND USUARIOS_ACTIVO = 1");
                 $arreglo = Array();
                 foreach($tipo as $presente)
                 {
                     array_push($arreglo,Array("id" => $presente["id"], "nickname" => $presente["nickname"], "nombre" => $presente["nombre"], "rol" => $presente["tipo"]));
                 }
                 return Array("mensaje" => "ok", "data"  =>$arreglo);
+            }
+        }
+        return Array("mensaje" => "error");
+    }
+
+    /**
+     * Funcion para actualizar la contraseña desde el mismo usuario
+     * 
+     * @param Object $data Los datos de la peticion
+     * @return Array Un arreglo con la información solicitada
+     * @author Juanjo Romero
+     */
+    function update_password($data)
+    {
+        if(!validar_parametros_option($data, ["token", "password"],2))
+        {
+            return Array("mensaje" => "error");
+        }
+        $validacion = validar_token($data->token);
+        if($validacion)
+        {
+            $actualizar = $GLOBALS["DB"]->ejecutar_consulta("UPDATE usuario_usuarios SET USUARIOS_PASSWORD = '{$data->password}', USUARIOS_PASSWORD_HISTORIAL = 1 WHERE USUARIOS_ID = {$validacion['id']}");
+            if($actualizar)
+            {
+                return Array("mensaje" => "ok");
             }
         }
         return Array("mensaje" => "error");
@@ -174,23 +202,24 @@
      * Funcion para eliminar un usuario
      * Solo tienen acceso los Administrdores y Root
      * 
-     * @param Object $data Los datos recibidos de la peticion
+     * @param String $token Los datos recibidos de la peticion
+     * @param Integer $id Los datos recibidos de la peticion
      * @return Array Un array con los datos solicitados
      * @author Juanjo Romero
      */
-    function delete_user($data)
+    function delete_user($token, $id)
     {
-        if(!validar_parametros_option($data, ["token", "id"],2))
+        if(!validar_parametros_get([$token, $id],2))
         {
             return Array("mensaje" => "error");
         }
-        $validacion = validar_token($data->token);
+        $validacion = validar_token($token);
         if($validacion)
         {
             $permiso = $GLOBALS["DB"]->ejecutar_consulta("SELECT USUARIOS_TIPO FROM usuario_usuarios WHERE USUARIOS_ID = {$validacion['id']} AND USUARIOS_ACTIVO=1");
             if($permiso["USUARIOS_TIPO"]==1 || $permiso["USUARIOS_TIPO"]==2)
             {
-                $delete = $GLOBALS["DB"]->ejecutar_consulta("UPDATE usuario_usuarios SET USUARIOS_ACTIVO=0 WHERE USUARIOS_ID={$data->id}");
+                $delete = $GLOBALS["DB"]->ejecutar_consulta("UPDATE usuario_usuarios SET USUARIOS_ACTIVO = 0 WHERE USUARIOS_ID = {$id}");
                 if($delete)
                 {
                     return Array("mensaje" => "ok");
@@ -224,7 +253,7 @@
             {
                 if($type!="ROOT" && $type!="root")
                 {
-                    $tipo = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT USUARIOS_ID AS id, USUARIOS_NICKNAME AS nickname, USUARIOS_NOMBRE AS nombre, USUARIOS_PASSWORD_HISTORIAL AS pass, ROL_DESCRIPCION AS tipo FROM usuario_usuarios INNER JOIN usuario_rol ON ROL_ID=USUARIOS_TIPO WHERE ROL_DESCRIPCION = '{$type}'");
+                    $tipo = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT USUARIOS_ID AS id, USUARIOS_NICKNAME AS nickname, USUARIOS_NOMBRE AS nombre, USUARIOS_PASSWORD_HISTORIAL AS pass, ROL_DESCRIPCION AS tipo FROM usuario_usuarios INNER JOIN usuario_rol ON ROL_ID=USUARIOS_TIPO WHERE ROL_DESCRIPCION = '{$type}' AND USUARIOS_ACTIVO = 1");
                     $arreglo = Array();
                     foreach($tipo as $presente)
                     {

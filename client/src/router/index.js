@@ -8,7 +8,12 @@ import Recorrido from '@/views/Recorrido'
 import Ubicacion from '@/views/Ubicacion'
 import Configuracion from '@/views/Configuracion'
 import Roles from '@/views/Roles'
-import Boleteras from '@/views/AddBoletera'
+import Boleteras from '@/views/Boleteras'
+import Caja from '@/views/Caja'
+import AbrirVuelta from '@/views/AbrirVuelta'
+import RecibirVuelta from '@/views/RecibirVuelta'
+import CajaHome from '@/views/CajaHome'
+import liquidarTurno from '@/views/LiquidarChofer'
 
 Vue.use(Router)
 
@@ -53,9 +58,44 @@ const routes= [
         component: Configuracion
     },
     {
-        path: "/agregarBoleteras",
-        name: "agregarBoleteras",
+        path: "/boleteras",
+        name: "boleteras",
         component: Boleteras
+    },
+    {
+        path: "/caja",
+        component: Caja,
+        children: [
+            {
+                path: 'cajaHome',
+                name: 'cajaHome',
+                component: CajaHome
+            },
+            {
+                path: 'abrirVuelta',
+                name: 'abrirVuelta',
+                params: '',
+                component: AbrirVuelta
+            },
+            {
+                path: 'recibirVuelta/:id',
+                name: 'recibirVuelta',
+                component: RecibirVuelta
+            },
+            {
+                path: 'liquidarTurno',
+                name: 'liquidarTurno',
+                component: liquidarTurno
+            },
+            {
+                path: '/',
+                redirect: 'cajaHome'
+            }
+        ]
+    },
+    {
+        path: '*',
+        redirect: '/dashboard'
     }
 ]
 
