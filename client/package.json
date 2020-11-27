@@ -1,5 +1,5 @@
 {
-  "name": "client",
+  "name": "admin-bus",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -10,6 +10,8 @@
   "dependencies": {
     "axios": "^0.20.0",
     "core-js": "^3.6.5",
+    "jspdf": "^2.1.1",
+    "jspdf-autotable": "^3.5.13",
     "leaflet": "^1.7.1",
     "vue": "^2.6.11",
     "vue-leaflet": "^0.1.0",

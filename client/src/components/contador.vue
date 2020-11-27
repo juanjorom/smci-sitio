@@ -1,8 +1,14 @@
 <template>
     <v-container>
         <v-card>
-            <v-label>{{datos.propiedad}}</v-label>
-            <v-label>{{datos.cantidad}}</v-label>
+            <v-card-text>
+                <v-row>
+                    <v-span class="title">{{datos.propiedad}}</v-span>    
+                </v-row>
+                <v-row>
+                    <v-span class="subtitle-1">{{datos.prefijo}}{{datos.cantidad}}</v-span>
+                </v-row>
+            </v-card-text>
         </v-card>
     </v-container>
 </template>

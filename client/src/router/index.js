@@ -14,6 +14,7 @@ import AbrirVuelta from '@/views/AbrirVuelta'
 import RecibirVuelta from '@/views/RecibirVuelta'
 import CajaHome from '@/views/CajaHome'
 import liquidarTurno from '@/views/LiquidarChofer'
+import PagarReporte from '@/views/pagarReporte'
 
 Vue.use(Router)
 
@@ -86,6 +87,11 @@ const routes= [
                 path: 'liquidarTurno',
                 name: 'liquidarTurno',
                 component: liquidarTurno
+            },
+            {
+                path: 'pagarReporte',
+                name: 'pagarReporte',
+                component: PagarReporte
             },
             {
                 path: '/',

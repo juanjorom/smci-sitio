@@ -7,7 +7,7 @@
           <v-card-text>
               <v-menu max-width="150" offset-y>
                   <template v-slot:activator="{on, attrs}">
-                      <v-text-field v-model="unidad" label="Unidad" v-bind="attrs" v-on="on" ></v-text-field>
+                      <v-text-field v-model="unidad" label="Unidad" v-bind="attrs" v-on="on" @blur="opacar('unidades', 'unidad')"></v-text-field>
                   </template>
                   <v-list v-model="unidadCodigo">
                       <v-list-item v-for="(item, index) in unidades" :key="index" @click="unidad=item.nombre; unidadCodigo=item.codigo" >
@@ -17,7 +17,7 @@
               </v-menu>
               <v-menu  max-width="300" offset-y>
                   <template v-slot:activator="{on, attrs}">
-                      <v-text-field v-model="chofer" label="Chofer" v-bind="attrs" v-on="on" ></v-text-field>
+                      <v-text-field v-model="chofer" label="Chofer" v-bind="attrs" v-on="on" @blur="opacar('choferes', 'chofer')"></v-text-field>
                   </template>
                   <v-list v-model="choferCodigo">
                       <v-list-item v-for="(item, index) in choferes" :key="index" @click="chofer=item.nombre; choferCodigo=item.nickname" >
@@ -52,7 +52,7 @@
                   <v-col cols="10">
                   <v-menu max-width="300" offset-y>
                   <template v-slot:activator="{on, attrs}">
-                      <v-text-field v-model="boletera" label="Boletera" placeholder="Codigo" v-bind="attrs" v-on="on" ></v-text-field>
+                      <v-text-field v-model="boletera" label="Boletera" placeholder="Codigo" v-bind="attrs" v-on="on" @blur="opacar('boleteras', 'boletera')"></v-text-field>
                   </template>
                   <v-list>
                       <v-list-item v-for="(item, index) in boleteras" :key="index" @click="boletera=item.codigo" >
@@ -89,16 +89,16 @@
             <v-card>
                 <v-card-title>Ingrese su contraseña</v-card-title>
                 <v-card-text>
-                    <v-text-field v-model="password" label="Contraseña" placeholder="Contraseña" type="password"></v-text-field>
+                    <v-text-field v-model="password" label="Contraseña" placeholder="Contraseña" type="password" @keydown="isEnter($event)"></v-text-field>
                 </v-card-text>
                 <v-card-actions>
                     <v-btn @click="validarPassword">Ok</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="loader" persistent>
-            <v-progress-circular indeterminate ></v-progress-circular>
-        </v-dialog>
+        <v-overlay v-model="loader" absolute >
+                    <v-progress-circular indeterminate :size="100" :width="10"></v-progress-circular>
+        </v-overlay>
   </v-container>
 </template>
 
@@ -120,18 +120,29 @@ export default {
         password: "",
         loader: false
     }),
-
+    beforeMount(){
+        if(this.logeado==null && this.sesion==false){
+            this.$router.push('login')
+        }
+    },
+    watch: {
+        unidadCodigo: function(){
+            this.traerBoleteras(this.unidadCodigo)
+        }
+    },
     mounted(){
         this.traerUnidades()
         this.traerChoferes()
         this.traerRutas()
-        this.traerBoleteras()
         if(this.$route.params.unidad!=undefined){
             this.unidadCodigo = this.allUnidades.find(el => el.nombre==this.$route.params.unidad).codigo
             this.unidad = this.$route.params.unidad
             this.choferCodigo = this.allChoferes.find(el => el.nombre == this.$route.params.chofer).nickname
             this.chofer = this.$route.params.chofer
             this.ruta = this.allRutas.find(el => el.ruta==this.$route.params.ruta).codigo
+            if(this.$route.params.boleteras.length>0){
+                this.boleterasAsignadas= this.$route.params.boleteras
+            }
         }
     },
     computed:{
@@ -139,13 +150,15 @@ export default {
             allRutas: 'cajeras/getAllRutas',
             allUnidades: 'cajeras/getAllUnidades',
             allChoferes: 'cajeras/getAllChoferes',
-            allBoleteras: 'cajeras/getAllBoleterasList',
+            allBoleteras: 'cajeras/getBoleterasAsignar',
             someUnidades: 'cajeras/getUnidadesFilter',
             someChoferes: 'cajeras/getChoferesFilter',
-            someBoleteras: 'cajeras/getBoleterasFilter'
+            someBoleteras: 'cajeras/getBoleterasFilter',
+            logeado: 'logdata/getKey',
+            sesion: 'logdata/getSucess'
         }),
         activar(){
-            if(this.unidad!="" && this.chofer!="" && this.ruta!="" && this.boleterasAsignadas.length>0){
+            if(this.unidad!="" && this.chofer!="" && this.ruta!="" && this.hora!="" && this.boleterasAsignadas.length>0){
                 return false
             }
             return true
@@ -164,9 +177,10 @@ export default {
         },
         boleteras(){
             if(this.boletera!=""){
-                return this.someBoleteras(this.boletera.toUpperCase())
+                var bol = this.someBoleteras(this.boletera.toUpperCase())
+                return bol.filter(el => !(this.boleterasAsignadas.includes(el.codigo)))
             }
-            return this.allBoleteras
+            return this.allBoleteras.filter(el => !(this.boleterasAsignadas.includes(el.codigo)))
         }
     },
     methods: {
@@ -174,11 +188,15 @@ export default {
             traerUnidades: 'cajeras/getAllUnidadesServer',
             traerChoferes: 'cajeras/getAllChoferesServer',
             traerRutas: 'cajeras/getAllRutasServer',
-            traerBoleteras: 'cajeras/getAllBoleterasServer',
+            traerBoleteras: 'cajeras/getBoleterasAsignarServer',
             validar: 'logdata/validarPassword',
             iniciarVuelta: 'cajeras/iniciarVuelta'
         }),
-
+        isEnter(event){
+            if(event.key=="Enter"){
+                this.validarPassword()
+            }
+        },
         quitarBoletera(item){
             var index = this.boleterasAsignadas.findIndex(el=> el==item)
             this.boleterasAsignadas.splice(index,1)
@@ -190,9 +208,14 @@ export default {
                 }
             }
         },
+        opacar(arreglo, valor){
+            if(!this[arreglo].includes(this[valor])){
+                this[valor]=""
+            }
+        },
         async validarPassword(){
             if(this.password!=""){
-                if(this.validar(this.password)){
+                if(await this.validar(this.password)){
                     this.password=""
                     this.confirmar=false
                     this.loader=true

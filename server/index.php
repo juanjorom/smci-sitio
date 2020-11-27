@@ -17,7 +17,7 @@
     $metodo = $_SERVER['REQUEST_METHOD'];
     $datos = json_decode(file_get_contents("php://input"));
 
-    $file = fopen("pruebas.txt", 'a+');
+    /*$file = fopen("pruebas.txt", 'a+');
     fwrite($file, date("Y-m-d H:i:s") . PHP_EOL );
     fwrite($file, $metodo . PHP_EOL );
     fwrite($file, $recurso . PHP_EOL);
@@ -25,7 +25,7 @@
     fwrite($file, $_GET["token"] .PHP_EOL);
     fwrite($file, $_SERVER["QUERY_STRING"] .PHP_EOL);
 
-    fclose($file);   
+    fclose($file);*/   
 
     $GLOBALS['LOG']['Peticiones']->write("Peticion por metodo " .$metodo ." al recurso ". $recurso);
     switch ($metodo)
@@ -88,6 +88,18 @@
                 case "getAllOpenLaps":
                     $RESPUESTA = get_all_vueltas_abiertas($_GET['token']);
                 break;
+                case "getLapsbyUnidad":
+                    $RESPUESTA = get_vuelta_by_unidad($_GET['token'], $_GET['unidad']);
+                break;
+                case "getAllTurnos":
+                    $RESPUESTA = get_all_turnos($_GET['token']);
+                break;
+                case "getTurnoById":
+                    $RESPUESTA = get_turno_by_id($_GET["token"], $_GET["turno"]);
+                break;
+                case "getBoleterasAsignar":
+                    $RESPUESTA = get_boleteras_asignables($_GET["token"], $_GET["unidad"]);
+                break;
                 default;
                     $RESPUESTA= Array("mensaje" => "Recurso no existe");
                 break;
@@ -111,6 +123,9 @@
                 break;
                 case "closeLap":
                     $RESPUESTA = close_lap($datos);
+                break;
+                case "pagarTurno":
+                    $RESPUESTA = pagar_turno($datos);
                 break;
                 default:
                     $RESPUESTA= Array("mensaje" => "Recurso no existe");

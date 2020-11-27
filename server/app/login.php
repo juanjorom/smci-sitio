@@ -45,7 +45,7 @@
      */
     function cerrar_sesion($datos)
     {
-        if(validar_parametros_option($datos, ["token"]))
+        if(!validar_parametros_option($datos, ["token"]))
         {
             return Array("mensaje" => "Usuario y/o Contraseña no especificado");
         }
@@ -71,7 +71,7 @@
      */
     function verificar_password($datos)
     {
-        if(validar_parametros_option($datos,["token", "password"],2))
+        if(!validar_parametros_option($datos,["token", "password"],2))
         {
             return Array("mensaje" => "error");
         }

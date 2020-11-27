@@ -5,8 +5,8 @@
           <v-card-text>
               <v-text-field v-model="buscar" label="Buscar Unidad" placeholder="Numero">
               </v-text-field>
-              <v-card height="450" max-height="450" v-if="vueltas.length>0">
-                    <v-list >
+              <v-card height="450" max-height="450" class="overflow-y-auto" v-if="vueltas.length>0">
+                <v-list >
                   <v-list-item v-for="(lap, i) in vueltas"  :key="i">
                       <v-list-item-icon>
                                 <v-icon>mdi-bus</v-icon>
@@ -36,10 +36,10 @@
             <v-card>
                 <v-card-title>Ingrese su contraseña</v-card-title>
                 <v-card-text>
-                    <v-text-field v-model="password" label="Contraseña" placeholder="Contraseña" type="password"></v-text-field>
+                    <v-text-field v-model="password" label="Contraseña" placeholder="Contraseña" type="password" @keydown="isEnter($event)"></v-text-field>
                 </v-card-text>
                 <v-card-actions>
-                    <v-btn @click="validarPassword">Ok</v-btn>
+                    <v-btn @click="validarPassword()">Ok</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -83,6 +83,11 @@ export default {
             cerrarVuelta: 'cajeras/closeLap',
             validar: 'logdata/validarPassword'
         }),
+        isEnter(event){
+            if(event.key=="Enter"){
+                this.validarPassword()
+            }
+        },
         abrir(){
             this.$router.push('abrirVuelta')
         },
@@ -92,9 +97,9 @@ export default {
         liquidar(){
             this.$router.push('liquidarTurno')
         },
-        validarPassword(){
+        async validarPassword(){
             if(this.password!=""){
-                if(this.validar(this.password)){
+                if(await this.validar(this.password)){
                     this.password=""
                     this.modal=false
                     this.$router.push("recibirVuelta/"+this.id)

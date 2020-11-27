@@ -7,7 +7,8 @@
             <v-select v-model="permisionarioSelected" label="Permisionario" :items="permisionarios" item-text="nombre" item-value="clave" ></v-select>
         </v-card-text>
         <v-card-actions>
-            <v-btn @click="modal=true" :disabled="boton">Agregar</v-btn>
+            <v-btn @click="modal=true" color="success" :disabled="boton">Agregar</v-btn>
+            <v-btn @click="cancelar()" color="error">Cancelar</v-btn>
         </v-card-actions>
         <v-dialog v-model="modal" max-width="400">
             <v-card>
@@ -17,6 +18,7 @@
                 </v-card-text>
                 <v-card-actions>
                     <v-btn @click="validarPassword">Ok</v-btn>
+                    <v-btn @click="modal=false">Cancelar</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -54,9 +56,16 @@ export default {
             addBoletera: 'cajeras/addBoletera',
             validar: 'logdata/validarPassword'
         }),
-        validarPassword(){
+        cancelar(){
+            this.password=""
+            this.inicia = ""
+            this.termina = ""
+            this.permisionarioSelected = ""
+            this.$emit('cerrar')
+        },
+        async validarPassword(){
             if(this.password!=""){
-                if(this.validar(this.password)){
+                if(await this.validar(this.password)){
                     this.password=""
                     this.modal=false
                     this.agregarBoletera()
@@ -74,6 +83,10 @@ export default {
             {
                 if(parseInt(this.termina,10) >= parseInt(this.inicia,10)){
                     this.addBoletera({inicio: this.inicia, termina: this.termina, permisionario:this.permisionarioSelected})
+                    this.termina="",
+                    this.inicia="",
+                    this.permisionarioSelected=""
+                    this.modal=false
                 }else{
                     alert("EL numero donde termina debe ser mayor que donde inicia")
                 }

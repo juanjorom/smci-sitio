@@ -12,7 +12,7 @@
                                 <v-form ref="form">
                                     <v-text-field v-model="form.user" ref="user" type="text" label="Usuario" :error-messages="getErrors('user')">
                                     </v-text-field>
-                                    <v-text-field v-model="form.password" ref="password" type="password" label="Contraseña" :error-messages="getErrors('password')">
+                                    <v-text-field v-model="form.password" ref="password" type="password" label="Contraseña" :error-messages="getErrors('password')" @keydown="isEnter($event,'password')">
                                     </v-text-field>
                                 </v-form>
                             </v-card-text>
@@ -65,6 +65,11 @@ export default {
         ...mapActions('logdata', [
             'log',
         ]),
+        isEnter(event){
+            if(event.key=="Enter"){
+                this.validateUser()
+            }
+        },
         getErrors (fieldName){
             const field = this.$v.form[fieldName]
 

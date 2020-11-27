@@ -7,10 +7,9 @@ const state = {
     choferes: [],
     rutas: [],
     openLaps: [],
-    proxChofer: "",
-    proxRuta: "",
-    proxUnidad: "",
-    proxBoleteras: []
+    turnos: [],
+    turnoPagar: null,
+    boleterasAsignar: []
 }
 
 const getters = {
@@ -20,6 +19,9 @@ const getters = {
     getAllBoleterasList: state => {
         return state.boleteras.filter(el => el.estado=="NO ASIGNADA")
     },
+    getBoleterasAsignar: state => {
+        return state.boleterasAsignar
+    },
     getBoleteraById: state => id => {
         return state.boleteras.find(el => el.codigo==id)
     },
@@ -27,7 +29,7 @@ const getters = {
         return state.boleteras.filter(el => el.status == estado)
     },
     getBoleterasFilter: state => filtro => {
-        return state.boleteras.filter(el =>  (el.codigo.includes(filtro) && el.estado=="NO ASIGNADA")) 
+        return state.boleterasAsignar.filter(el =>  (el.codigo.includes(filtro) && el.estado=="NO ASIGNADA")) 
     },
     getPermisionarios: state => {
         return state.permisionarios
@@ -73,6 +75,15 @@ const getters = {
     },
     getProxBoleteras: state =>{
         return state.proxBoleteras
+    },
+    getAllTurnos: state => {
+        return state.turnos
+    },
+    getTurnosFilter: state => filtro => {
+        return state.turnos.filter(el => el.unidad == filtro)
+    },
+    getTurnoPagar: state => {
+        return state.turnoPagar
     }
 }
 
@@ -98,17 +109,14 @@ const mutations = {
     setOpenLaps(state, vueltas){
         state.openLaps = vueltas
     },
-    setProxChofer(state, chofer){
-        state.proxChofer = chofer
+    setTurnos(state, turnos){
+        state.turnos = turnos
     },
-    setProxUnidad(state, unidad){
-        state.proxChofer = unidad
+    setTurnoPagar(state, turno){
+        state.turnoPagar = turno
     },
-    setProxRuta(state, ruta){
-        state.proxRuta = ruta
-    },
-    setProxBoleteras(state, boleteras){
-        state.proxBoleteras = boleteras
+    setBoleterasAsignar(state, boleteras){
+        state.boleterasAsignar = boleteras
     }
 }
 
@@ -138,13 +146,20 @@ const actions = {
             totalBoletos: parseInt(boletera.termina,10) - parseInt(boletera.inicio,10)+1,
             status: "NO ASIGNADA"
         }
-        var peticion = await axios.post(rootState.logdata.host + "/addBoletera", datos)
-        if(peticion.data.mensaje=="ok"){
-            commit('addBoleteraLocal', peticion.data.data)
-            alert("Boletera Añadida con éxito")
-        }
-        else{
-            alert("Error al añadir")
+        try {
+            var peticion = await axios.post(rootState.logdata.host + "/addBoletera", datos)
+            if(peticion.data.mensaje=="ok"){
+                commit('addBoleteraLocal', peticion.data.data)
+                alert("Boletera Añadida con éxito. Codigo: "+ peticion.data.data.codigo)
+                return peticion.data.data.codigo
+            }
+            else{
+                alert("Error al añadir")
+                return false
+            }
+        } catch (error) {   
+            console.log("Error de conexion", error);
+            return false
         }
     },
     async deleteBoletera({rootState}, boletera){
@@ -212,7 +227,7 @@ const actions = {
         try {
             var peticion = await axios.get(rootState.logdata.host+"/getAllOpenLaps?token="+rootState.logdata.key)
             if(peticion.data.mensaje=="ok"){
-                commit('setOpenLaps', peticion.data.data)
+                commit('setOpenLaps',  peticion.data.data)
             }else{
                 commit('setOpenLaps',[])
             }
@@ -228,11 +243,59 @@ const actions = {
             var peticion =  await axios.put(rootState.logdata.host+"/closeLap", datos)
             if(peticion.data.mensaje=="ok"){
                 return true
-            }else{
-                return false
             }
+            return false
         } catch {
             return false
+        }
+    },
+    async getAllTurnosServer({rootState, commit}){
+        try {
+            var peticion = await axios.get(rootState.logdata.host+"/getAllTurnos?token="+rootState.logdata.key)
+            if(peticion.data.mensaje=="ok"){
+                commit("setTurnos", peticion.data.data)
+            }else{
+                commit("setTurnos", [])
+            }
+            
+        } catch (error) {
+            console.log("Error de conexion ", error);
+        }
+    },
+    async getTurnoById({rootState, commit}, id){
+        try{
+            var peticion = await axios.get(rootState.logdata.host+"/getTurnoById?token="+rootState.logdata.key+"&turno="+id)
+            if(peticion.data.mensaje=="ok"){
+                commit('setTurnoPagar' ,peticion.data.data)
+            }
+        }catch (error){
+            console.log("Error de conexion", error);
+        }
+    },
+    async pagarTurno({rootState}, turno){
+        try{
+            turno.token = rootState.logdata.key
+            const peticion = await axios.put(rootState.logdata.host+"/pagarTurno", turno)
+            console.log(peticion);
+            if(peticion.data.mensaje=="ok"){
+                return true
+            }
+            return false
+        } catch (error) {
+            console.log("Error en la conexion ",error)
+            return false
+        }
+    },
+    async getBoleterasAsignarServer({rootState, commit}, unidad){
+        try{
+            var peticion = await axios.get(rootState.logdata.host+"/getBoleterasAsignar?token="+rootState.logdata.key +"&unidad="+unidad)
+            if(peticion.data.mensaje=="ok"){
+                commit('setBoleterasAsignar', peticion.data.data)
+            }else{
+                commit('setBoleterasAsignar', [])
+            }
+        } catch (error){
+            console.log("Error en la conexion ", error)
         }
     }
 }

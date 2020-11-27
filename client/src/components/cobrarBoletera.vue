@@ -1,7 +1,8 @@
 <template>
-    <v-card height="700" max-height="700">
-        <v-card-title> Boletera {{boleteraLoc.codigo}}</v-card-title>
-        <v-card-subtitle>La boletera inicia en el boleto {{boleteraLoc.boletoInicial}}</v-card-subtitle>
+    <v-dialog v-model="ver" max-width="800" persistent>
+        <v-card height="700" max-height="700">
+        <v-card-title> Boletera {{boletera.codigo}}</v-card-title>
+        <v-card-subtitle>La boletera inicia en el boleto {{boletera.boletoInicial}}</v-card-subtitle>
         <v-card-subtitle>Por favor escriba el monto en el campo y presione Enter para agregar un nuevo boleto</v-card-subtitle>
         <v-card-text>
             <div class="contenedor">
@@ -60,16 +61,17 @@
             </v-card>
         </v-dialog>
     </v-card>
+    </v-dialog>
 </template>
 
 <script>
 export default {
     props:{
         boletera: Object,
+        ver: Boolean
     },
     data: function(){
         return{
-            boleteraLoc: this.boletera,
             boletos:{keys:[this.boletera.boletoInicial], montos:[""]},
             focusBander: 0,
             alerta: false,
@@ -77,6 +79,7 @@ export default {
             vacios: false,
             regresar: {boletos:{}}
     }},
+
     computed: {
         totalBoletos(){
             if(this.boletos.montos[this.boletos.montos.length-1]==""){
@@ -98,13 +101,15 @@ export default {
     methods:{
         agregar(evt,index){
             if(evt.keyCode==13){
-                if(this.boletos.montos[index]=="" ||  parseInt(this.boletos.montos[index],10)<9 || this.boletos.montos[index].length>2){
+                if(this.boletos.montos[index]=="" ||  parseInt(this.boletos.montos[index],10)<9 || this.boletos.montos[index].length>2 ){
                     this.alerta=true
                 }else{
-                    if(index==this.boletos.montos.length-1){
-                        this.boletos.keys.push(parseInt(this.boletos.keys[index],10)+1)
-                        this.boletos.montos.push("")
-                        this.focusBander=index+1
+                    if(index==this.boletos.montos.length-1 ){
+                        if(this.boletos.keys.length<parseInt(this.boletera.totalBoletos)){
+                            this.boletos.keys.push((parseInt(this.boletos.keys[index],10)+1).toString(10))
+                            this.boletos.montos.push("")
+                            this.focusBander=index+1
+                        }
                     }else{
                         this.focusBander++
                         this.$refs.monto[this.focusBander].focus()
@@ -153,19 +158,16 @@ export default {
             }
         },
         saveTickets(){
-            var ultimo=0
-            this.boletos.montos.forEach((el, index)=>{
-                if(el!=""){
-                    this.regresar.boletos[this.boletos.keys[index]] = el
-                    ultimo++
-                }
-            })
-            this.regresar.monto=this.montoTotal
-            this.regresar.totalBoletos=this.totalBoletos
-            this.regresar.boletoInicial=this.boletos.keys[0]
-            this.regresar.boletoFinal=this.boletos.keys[ultimo]
-            this.regresar.codigo=this.boleteraLoc.codigo
-            this.focusBander= 0
+            for(var i = 0; i<this.totalBoletos; i++){
+                this.regresar.boletos[this.boletos.keys[i]] =this.boletos.montos[i]
+            }
+            this.regresar.monto = this.montoTotal
+            this.regresar.totalBoletos = this.totalBoletos
+            this.regresar.boletoInicial = this.boletos.keys[0]
+            this.regresar.boletoFinal = this.boletos.keys[this.totalBoletos-1]
+            this.regresar.codigo = this.boletera.codigo
+            this.regresar.sobrantes = parseInt(this.boletera.totalBoletos,10) - this.totalBoletos
+            this.focusBander = 0
             this.boletos = {keys:[this.boletera.boletoInicial], montos:[""]}
             this.$emit('hecho', this.regresar)
         },

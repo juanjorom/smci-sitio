@@ -5,45 +5,147 @@
             <v-card-subtitle>Chofer: {{vuelta.chofer}}</v-card-subtitle>
             <v-card-text>
                 <v-row>
-                  <v-col cols="8">
-                  <v-menu max-width="300" offset-y>
-                  <template v-slot:activator="{on, attrs}">
-                      <v-text-field v-model="boletera" label="Boletera" placeholder="Ingrese la boletera a cobrar" v-bind="attrs" v-on="on" ></v-text-field>
-                  </template>
-                  <v-list>
-                      <v-list-item v-for="(item, index) in boleterasCobrar" :key="index" @click="boletera=item.codigo" >
-                          <v-list-item-title >{{item.codigo}}</v-list-item-title>
-                      </v-list-item>
-                  </v-list>
-              </v-menu>
-              </v-col>
-              <v-col cols="4">
-                  <v-btn @click="prepararBoletera()" :disabled="boletera==''">Cobrar boletos</v-btn>
-              </v-col>
-              </v-row>
-              <v-row>
-                  <v-list>
-                      <v-list-item v-for="(item, index) in boleterasCobradas" :key="index">
-                          <v-list-item-icon>
-                              <v-icon>mdi-ticket</v-icon>
-                          </v-list-item-icon>
-                          <v-list-item-content>
-                              <v-list-item-title>{{item.codigo}}</v-list-item-title>
-                              <v-list-item-subtitle>${{item.monto}}</v-list-item-subtitle>
-                              <v-list-item-subtitle>Boletos del {{item.boletoInicial}} al {{item.boletoFinal}}</v-list-item-subtitle>
-                              <v-list-item-subtitle>Total de boletos: {{item.totalBoletos}}</v-list-item-subtitle>
-                          </v-list-item-content>
-                      </v-list-item>
-                  </v-list>
-              </v-row>
+                    <v-col cols="12">
+                        <v-card tile>
+                            <v-card-text>
+                                <v-row>
+                                    <v-col cols="8">
+                                    <v-card>
+                                        <v-card-title>Boleteras</v-card-title>
+                                        <v-card-text>
+                                            <v-row>
+                                                <v-col cols="8">
+                                                    <v-menu max-width="300" offset-y>
+                                                        <template v-slot:activator="{on, attrs}">
+                                                            <v-text-field v-model="boletera" label="Boletera" placeholder="Ingrese la boletera a cobrar" v-bind="attrs" v-on="on" ></v-text-field>
+                                                        </template>
+                                                        <v-list>
+                                                            <v-list-item v-for="(item, index) in boleterasCobrar" :key="index" @click="boletera=item.codigo" >
+                                                                <v-list-item-title >{{item.codigo}}</v-list-item-title>
+                                                            </v-list-item>
+                                                        </v-list>
+                                                    </v-menu>
+                                                </v-col>
+                                                <v-col cols="4">
+                                                    <v-btn @click="prepararBoletera()" :disabled="boletera==''">Cobrar boletos</v-btn>
+                                                </v-col>
+                                            </v-row>
+                                            <v-row>
+                                                <v-col cols="12" >
+                                                    <v-card class="overflow-y-auto" height="300" max-height="300">
+                                                        <v-list>
+                                                            <v-list-item v-for="(item, index) in boleterasCobradas" :key="index">
+                                                                <v-list-item-icon>
+                                                                    <v-icon>mdi-ticket</v-icon>
+                                                                </v-list-item-icon>
+                                                                <v-list-item-content>
+                                                                    <v-list-item-title>{{item.codigo}}</v-list-item-title>
+                                                                    <v-list-item-subtitle>${{item.monto}}</v-list-item-subtitle>
+                                                                    <v-list-item-subtitle>Boletos del {{item.boletoInicial}} al {{item.boletoFinal}}</v-list-item-subtitle>
+                                                                    <v-list-item-subtitle>Total de boletos: {{item.totalBoletos}}</v-list-item-subtitle>
+                                                                    <v-list-item-subtitle>Restantes: {{item.sobrantes}}</v-list-item-subtitle>
+                                                                </v-list-item-content>
+                                                            </v-list-item>
+                                                        </v-list>
+                                                    </v-card>
+                                                </v-col>
+                                            </v-row>
+                                        </v-card-text>
+                                    </v-card>  
+                                </v-col>
+                                <v-col cols="4">
+                                    <v-card class="overflow-y-auto" height="500" max-height="500">  
+                                        <v-card-title>Gastos</v-card-title>
+                                        <v-card-text>
+                                            <v-row>
+                                                <v-btn @click="gastar=true">Agregar Gasto</v-btn>
+                                            </v-row>
+                                            <v-row>
+                                                <v-col>
+                                                    <v-list>
+                                                    <v-list-item v-for="(item, index) in gastos" :key="index">
+                                                        <v-list-item-content>
+                                                            <v-list-item-title>${{item.monto}} de {{item.descripcion}}</v-list-item-title>
+                                                        </v-list-item-content>
+                                                        <v-list-item-action>
+                                                                <v-btn color="error" small fab outlined @click="revGasto(item)">
+                                                                    <v-icon>mdi-close</v-icon>
+                                                                </v-btn>
+                                                            </v-list-item-action>
+                                                    </v-list-item>
+                                                </v-list>
+                                                </v-col>
+                                            </v-row>
+                                        </v-card-text>        
+                                    </v-card>
+                                </v-col>
+                                </v-row>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+                <v-row> 
+                    <v-col cols="4">
+                        <v-card>
+                            <v-card-title>Venta Bruta</v-card-title>
+                            <v-card-text>
+                                <p class="display-2">${{ventaBruta}}</p>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                    <v-col cols="4">
+                        <v-card>
+                            <v-card-title>Total de gastos</v-card-title>
+                            <v-card-text>
+                                <p class="display-2">${{gastosTotal}}</p>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                    <v-col cols="4">
+                        <v-card>
+                            <v-card-title>Total</v-card-title>
+                            <v-card-text>
+                                <p class="display-2">${{montoVuelta}}</p>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
+                <v-row>
+                    <v-col cols="6">
+                        <v-card  height="200" >
+                            <v-card-title>Entregado</v-card-title>
+                            <v-card-text>
+                                <v-text-field v-model="entregado" label="Cantidad" prefix="$" @keydown="validarTecla($event)"></v-text-field>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                    <v-col cols="6">
+                        <v-card class="overflow-y-auto" height="200" max-height="200" >
+                            <v-card-title>Comentarios</v-card-title>
+                            <v-card-text>
+                                <v-textarea auto-grow label="Escriba aqui las observaciones" v-model="comentarios"></v-textarea>
+                            </v-card-text>
+                        </v-card>
+                    </v-col>
+                </v-row>
             </v-card-text>
             <v-card-actions>
-                <v-btn color="success" @click="alertaNueva=true">Cobrar</v-btn>
+                <v-btn color="success" @click="auth=true">Cobrar</v-btn>
                 <v-btn to="/caja" color="error" >Cancelar</v-btn>
             </v-card-actions>
         </v-card>
-        <v-dialog v-model="modal" max-width="800" persistent>
-            <boletear :boletera="boleteraCobrando" :boletos="this.boletos" v-on:cerrar="modal=false; boleteraCobrando={}; boletera=''" v-on:hecho=" boleteada"></boletear>
+        <boletear v-if="modal" :ver="modal" :boletera="boleteraCobrando" v-on:cerrar="modal=false; boleteraCobrando={}; boletera=''" v-on:hecho="boleteada"></boletear>
+        <v-dialog v-model="auth" max-width="300" >
+            <v-card>
+                <v-card-title>Ingresar contraseña</v-card-title>
+                <v-card-text>
+                    <v-text-field label="Contraseña" v-model="password" type="password" @keydown="isEnter($event)"></v-text-field>
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn @click="autenticar()">Ok</v-btn>
+                    <v-btn @click="auth=false">Cancelar</v-btn>
+                </v-card-actions>
+            </v-card>
         </v-dialog>
         <v-dialog v-model="alertaNueva" max-width="300" persistent>
             <v-card>
@@ -52,19 +154,29 @@
                     Desea abrir una vuelta nueva
                 </v-card-text>
                 <v-card-actions>
-                    <v-btn @click="cobrarNueva()">Si</v-btn>
-                    <v-btn @click="cobrar()">No</v-btn>
+                    <v-btn @click="boleterasNuevas()">Si</v-btn>
+                    <v-btn to="/cajaHome">No</v-btn>
                 </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="gastar" max-width="300">
+            <v-card>
+                <v-card-title>Añadir Gasto</v-card-title>
+                <v-card-text>
+                    <v-text-field label="Descripcion" v-model="descripcion"></v-text-field>
+                    <v-text-field label="Monto" v-model="montoGasto" @keydown="validarTecla($event)" prefix="$"></v-text-field>
+                    <v-btn @click="addGasto()">Ok</v-btn>
+                </v-card-text>
             </v-card>
         </v-dialog>
         <v-dialog v-model="alertaBol" max-width="300" persistent>
             <v-card>
                 <v-card-title>Alerta Boletos</v-card-title>
                 <v-card-text>
-                    {{mensaje}} ¿Desea añadirlos a la siguiente vuelta?
+                    Hay boleteras que no fueron cobrardas. ¿Desea añadirlos a la siguiente vuelta?
                 </v-card-text>
                 <v-card-actions>
-                    <v-btn @click="abrirNuevaBoletos(); alertaBol=false">Si</v-btn>
+                    <v-btn @click="abrirNuevaBoletos()">Si</v-btn>
                     <v-btn @click="abrirNueva()">No</v-btn>
                 </v-card-actions>
             </v-card>
@@ -77,7 +189,11 @@ import { mapActions, mapGetters } from 'vuex'
 import boletear from '@/components/cobrarBoletera'
 export default {
     beforeMount(){
-        this.vuelta= this.vueltaFind(this.$route.params.id)
+        if(this.logeado==null && this.sesion==false){
+            this.$router.push('login')
+        }else{
+            this.vuelta= this.vueltaFind(this.$route.params.id)
+        }
     },
     data: () => ({
         modal: false,
@@ -88,11 +204,22 @@ export default {
         boletos: {},
         alertaBol: false,
         alertaNueva: false,
-        mensaje: ""
+        mensaje: "",
+        auth: false,
+        password: "",
+        mover: [],
+        entregado: "",
+        gastos: [],
+        gastar: false,
+        descripcion: "",
+        montoGasto: "",
+        comentarios: ""
     }),
     computed: {
         ...mapGetters({
-            vueltaFind: 'cajeras/getLapById'
+            vueltaFind: 'cajeras/getLapById',
+            logeado: 'logdata/getKey',
+            sesion: 'logdata/getSucess'
         }),
         boleterasCobrar(){
             return this.vuelta.boleteras.filter(el => this.boleterasCobradas.find(item => item.codigo==el.codigo)==undefined) 
@@ -101,17 +228,51 @@ export default {
             return this.vuelta.boleteras.filter(el => this.boleterasCobradas.find(item => item.totalBoletos!=el.totalBoletos)!=undefined)
         },
         montoVuelta(){
+            return parseFloat(this.ventaBruta-this.gastosTotal).toFixed(2)
+        },
+        gastosTotal(){
+            var bol=0
+            this.gastos.forEach(element => {
+                bol+= parseFloat(element.monto)
+            })
+            return parseFloat(bol).toFixed(2)
+        },
+        ventaBruta(){
             var bol=0;
             this.boleterasCobradas.forEach(element => {
-                bol+=element.monto
+                bol+=parseFloat(element.monto)
             });
-            return bol
+            return parseFloat(bol).toFixed(2)
         }
     },
     methods: {
         ...mapActions({
-            cerrarVuelta: "cajeras/closeLapId"
+            cerrarVuelta: "cajeras/closeLapId",
+            addBoletera: 'cajeras/addBoletera',
+            validar: 'logdata/validarPassword',
         }),
+        addGasto(){
+            this.gastos.push({monto: this.montoGasto, descripcion: this.descripcion.toUpperCase()})
+            this.montoGasto="",
+            this.descripcion=""
+            this.gastar=false
+        },
+        isEnter(event){
+            if(event.key=="Enter"){
+                this.autenticar()
+            }
+        },
+        validarTecla(even){
+            if(even.key=="Enter"){
+                this.addGasto()
+            }
+            if(isNaN(even.key) && even.key!="." && even.keyCode!=8){
+                even.returnValue= false
+            }
+            else if(even.key=="." && this.entregado.includes(".")){
+                even.returnValue=false
+            }
+        },
         prepararBoletera(){
             this.boleteraCobrando = this.vuelta.boleteras.find(el => el.codigo==this.boletera)
             this.modal = true
@@ -120,41 +281,66 @@ export default {
             this.modal = false
             this.boleteraCobrando = {}
             this.boletera = ""
-            this.boleterasCobradas.push(tickets)
+            this.boleterasCobradas.push(Object.assign(tickets))
         },
-        cobrar(){
-            this.alertaNueva=false
-            this.cerrarVuelta({vuelta: this.vuelta.id, boleteras:this.boleterasCobradas, monto: this.montoVuelta})
-            this.$router.push({name:'cajaHome'})
+        async cobrar(){
+            if(await this.cerrarVuelta({vuelta: this.vuelta.id, boleteras:this.boleterasCobradas, bruto: this.ventaBruta, gastosTotal: this.gastosTotal, monto: this.montoVuelta, entregado: this.entregado, gastos: this.gastos, comentarios: this.comentarios})){
+                alert("Vuelta Cerrada con éxito")
+                this.crearBoletera()
+            }else{
+                alert("Error al cerrar la vuelta")
+            }
         },
-        cobrarNueva(){
-            if(this.boleterasCobrar.length>0){
-                this.mensaje="Hay boleteras que no fueron cobradas"
-                this.alertaBol=true
-            }else if(this.ventaTotal.length>0){
-                this.mensaje="Hay boletos sobrantes de boleteras"
+        boleterasNuevas(){
+            if(this.mover.length>0){
                 this.alertaBol=true
             }else{
                 this.abrirNueva()
             }
         },
+        abrirNueva(){
+            this.$router.push({name:'abrirVuelta', params: {unidad: this.vuelta.unidad, chofer: this.vuelta.chofer, ruta: this.vuelta.ruta, boleteras: []}})
+        },
         abrirNuevaBoletos(){
-            if(this.cerrarVuelta({vuelta: this.vuelta.id, boleteras:this.boleterasCobradas, monto: this.montoVuelta})){
-                alert("Vuelta Cerrada con éxito")
-                this.$router.push({name:'abrirVuelta', params: {unidad: this.vuelta.unidad, chofer: this.vuelta.chofer, ruta: this.vuelta.ruta }})
-            }else{
-                alert("Error al cerrar vuelta")
+            this.$router.push({name:'abrirVuelta', params: {unidad: this.vuelta.unidad, chofer: this.vuelta.chofer, ruta: this.vuelta.ruta, boleteras: this.mover}})
+        },
+        async crearBoletera(){
+            this.boleterasCobrar.forEach(este => {
+                this.mover.push(este.codigo)
+            })
+            if(this.ventaTotal.length>0){
+                var nuevas = []
+                this.ventaTotal.forEach(el => {
+                    var valor = this.boleterasCobradas.find(elem => elem.codigo==el.codigo)
+                    if(valor!=undefined){
+                        nuevas.push({inicio: (parseInt(valor.boletoFinal,10)+1).toString(10), termina: el.boletoFinal, permisionario: el.codigo.substr(0,el.codigo.search('-'))})
+                    }
+                })
+                for( var i=0; i<nuevas.length; i++){
+                    var pet = await this.addBoletera(nuevas[i])
+                    if(pet){
+                        this.mover.push(pet)
+                    }
+                }
             }
 
+            this.alertaNueva= true
         },
-        abrirNueva(){
-            this.alertaNueva=false;
-            if(this.cerrarVuelta({vuelta: this.vuelta.id, boleteras:this.boleterasCobradas, monto: this.montoVuelta})){
-                alert("Vuelta Cerrada con éxito")
-                this.$router.push({name:'abrirVuelta', params: {unidad: this.vuelta.unidad, chofer: this.vuelta.chofer, ruta: this.vuelta.ruta}})
+        async autenticar(){
+            if(this.password!=""){
+                if(await this.validar(this.password)){
+                    this.password=""
+                    this.auth=false
+                    this.cobrar()
+                }else{
+                    alert("Contraseña incorrecta")
+                }
             }else{
-                alert("Error al cerrar vuelta")
+                alert("Ingrese su contraseña")
             }
+        },
+        revGasto(item){
+            this.gastos.splice(this.gastos.indexOf(item),1)
         }
     },
     components: {
