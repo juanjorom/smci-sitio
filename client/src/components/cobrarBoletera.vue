@@ -72,7 +72,7 @@ export default {
     },
     data: function(){
         return{
-            boletos:{keys:[this.boletera.boletoInicial], montos:[""]},
+             boletos: this.calcular(),
             focusBander: 0,
             alerta: false,
             confirmar: false,
@@ -81,6 +81,7 @@ export default {
     }},
 
     computed: {
+       
         totalBoletos(){
             if(this.boletos.montos[this.boletos.montos.length-1]==""){
                 return this.boletos.montos.length-1
@@ -99,9 +100,18 @@ export default {
         },
     },
     methods:{
+        calcular(){
+            if(this.boletera.boletos!=undefined){
+                return {keys: Object.keys(this.boletera.boletos), montos: Object.values(this.boletera.boletos)}
+            }
+            else
+            {
+                return {keys:[this.boletera.boletoInicial], montos:[""]}
+            }
+        },
         agregar(evt,index){
             if(evt.keyCode==13){
-                if(this.boletos.montos[index]=="" ||  parseInt(this.boletos.montos[index],10)<9 || this.boletos.montos[index].length>2 ){
+                if(this.boletos.montos[index]=="" ||  parseInt(this.boletos.montos[index],10)<7 || this.boletos.montos[index].length>2 ){
                     this.alerta=true
                 }else{
                     if(index==this.boletos.montos.length-1 ){
@@ -117,7 +127,7 @@ export default {
                 }
             }else if(evt.keyCode==40){
                 if(this.focusBander<this.boletos.montos.length-1){
-                    if(this.boletos.montos[index]=="" ||  parseInt(this.boletos.montos[index],10)<9 || parseInt(this.boletos.montos[this.focusBander],10)>50){
+                    if(this.boletos.montos[index]=="" ||  parseInt(this.boletos.montos[index],10)<7 || parseInt(this.boletos.montos[this.focusBander],10)>50){
                         this.alerta=true
                     }else{
                         this.focusBander++
@@ -126,7 +136,7 @@ export default {
                 }
             }else if(evt.keyCode==38){
                 if(this.focusBander>0){
-                    if(this.boletos.montos[index]=="" ||  parseInt(this.boletos.montos[index],10)<9 || parseInt(this.boletos.montos[this.focusBander],10)>50){
+                    if(this.boletos.montos[index]=="" ||  parseInt(this.boletos.montos[index],10)<7 || parseInt(this.boletos.montos[this.focusBander],10)>50){
                         this.alerta=true
                     }else{
                         this.focusBander--
@@ -169,7 +179,14 @@ export default {
             this.regresar.sobrantes = parseInt(this.boletera.totalBoletos,10) - this.totalBoletos
             this.focusBander = 0
             this.boletos = {keys:[this.boletera.boletoInicial], montos:[""]}
-            this.$emit('hecho', this.regresar)
+            if(this.boletera.boletos!=undefined)
+            {
+                this.$emit('editar', this.regresar)
+            }
+            else
+            {
+                this.$emit('hecho', this.regresar)
+            }
         },
         campoClick(evt){
             if(this.boletos.montos.length>1){

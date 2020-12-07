@@ -136,7 +136,7 @@
             $permiso = $GLOBALS["DB"]->ejecutar_consulta("SELECT USUARIOS_TIPO FROM usuario_usuarios WHERE USUARIOS_ID = {$validacion['id']} AND USUARIOS_ACTIVO = 1");
             if($permiso["USUARIOS_TIPO"]==1 || $permiso["USUARIOS_TIPO"]==2)
             {
-                $tipo = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT USUARIOS_ID AS id, USUARIOS_NICKNAME AS nickname, USUARIOS_NOMBRE AS nombre, USUARIOS_PASSWORD_HISTORIAL AS pass, ROL_DESCRIPCION AS tipo FROM usuario_usuarios INNER JOIN usuario_rol ON ROL_ID=USUARIOS_TIPO WHERE USUARIOS_TIPO > 1 AND USUARIOS_ACTIVO = 1");
+                $tipo = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT USUARIOS_ID AS id, USUARIOS_NICKNAME AS nickname, USUARIOS_NOMBRE AS nombre, USUARIOS_PASSWORD_HISTORIAL AS pass, ROL_DESCRIPCION AS tipo FROM usuario_usuarios INNER JOIN usuario_rol ON ROL_ID=USUARIOS_TIPO WHERE USUARIOS_TIPO > 1 AND USUARIOS_ACTIVO = 1 ORDER BY nombre");
                 $arreglo = Array();
                 foreach($tipo as $presente)
                 {
@@ -232,7 +232,7 @@
 
     /**
      * Funcion para obtener los usuarios filtrados por tipo
-     * Acceso solo de Administradores y Root
+     * Acceso variable
      * 
      * @param String $token El token de acceso
      * @param String $type Tipo de usuarios a filtrar
@@ -247,21 +247,47 @@
         }
         $validacion = validar_token($token);
         if($validacion)
-        {
-            $permiso = $GLOBALS["DB"]->ejecutar_consulta("SELECT USUARIOS_TIPO FROM usuario_usuarios WHERE USUARIOS_ID = {$validacion['id']} AND USUARIOS_ACTIVO=1");
-            if($permiso["USUARIOS_TIPO"]==1 || $permiso["USUARIOS_TIPO"]==2)
+        {        
+            $tipo = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT USUARIOS_ID AS id, USUARIOS_NICKNAME AS nickname, USUARIOS_NOMBRE AS nombre, USUARIOS_PASSWORD_HISTORIAL AS pass, ROL_DESCRIPCION AS tipo FROM usuario_usuarios INNER JOIN usuario_rol ON ROL_ID=USUARIOS_TIPO WHERE ROL_DESCRIPCION = '{$type}' AND USUARIOS_ACTIVO = 1 ORDER BY nombre");
+            if($tipo)
             {
-                if($type!="ROOT" && $type!="root")
+                $arreglo = Array();
+                foreach($tipo as $presente)
                 {
-                    $tipo = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT USUARIOS_ID AS id, USUARIOS_NICKNAME AS nickname, USUARIOS_NOMBRE AS nombre, USUARIOS_PASSWORD_HISTORIAL AS pass, ROL_DESCRIPCION AS tipo FROM usuario_usuarios INNER JOIN usuario_rol ON ROL_ID=USUARIOS_TIPO WHERE ROL_DESCRIPCION = '{$type}' AND USUARIOS_ACTIVO = 1");
-                    $arreglo = Array();
-                    foreach($tipo as $presente)
-                    {
-                        array_push($arreglo,Array("id" => $presente["id"], "nickname" => $presente["nickname"], "nombre" => $presente["nombre"], "rol" => $presente["tipo"]));
-                    }
-                    return Array("mensaje" => "ok", "data"  =>$arreglo);
+                    array_push($arreglo,Array("id" => $presente["id"], "nickname" => $presente["nickname"], "nombre" => $presente["nombre"], "rol" => $presente["tipo"]));
                 }
+                return Array("mensaje" => "ok", "data"  =>$arreglo);
+            }
+        }
+        return Array("mensaje" => "error");
+    }
 
+    /**
+     * Funcion para obtener todos los roles
+     * Solo tienen acceso el Administrador y Root
+     * 
+     * @param String $token El token de acceso
+     * @return Array Un array con los datos solicitados
+     * @author Juanjo Romero
+     */
+    function get_roles($token)
+    {
+        if(!validar_parametros_get([$token]))
+        {
+            return Array("mensaje" => "error");
+        }
+        $validacion = validar_token($token);
+        if($validacion)
+        {
+            $tipo = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT ROL_ID AS id, ROL_DESCRIPCION AS rol FROM usuario_rol");
+            if($tipo)
+            {
+                $arreglo = Array();
+                foreach($tipo as $presente)
+                {
+                    array_push($arreglo,Array("id" => $presente["id"], "rol" => $presente["rol"]));
+                }
+                return Array("mensaje" => "ok", "data"  =>$arreglo);
             }
         }
         return Array("mensaje" => "error");

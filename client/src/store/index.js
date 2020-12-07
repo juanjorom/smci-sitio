@@ -1,14 +1,16 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
 import logdata from './modules/logdata'
-import appData from './modules/appData'
+import appdata from './modules/appData'
 import cajeras from './modules/cajeras'
+import admin from './modules/admin'
 Vue.use(Vuex)
 
 export default new Vuex.Store({
     modules: {
       logdata,
-      appData,
-      cajeras
+      appdata,
+      cajeras,
+      admin
     }
 })

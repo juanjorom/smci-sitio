@@ -150,16 +150,14 @@ const actions = {
             var peticion = await axios.post(rootState.logdata.host + "/addBoletera", datos)
             if(peticion.data.mensaje=="ok"){
                 commit('addBoleteraLocal', peticion.data.data)
-                alert("Boletera Añadida con éxito. Codigo: "+ peticion.data.data.codigo)
-                return peticion.data.data.codigo
+                return {mensaje: "El Codigo de Boletera es: " + peticion.data.data.codigo, codigo: peticion.data.data.codigo}
             }
             else{
-                alert("Error al añadir")
-                return false
+                return {mensaje:"Error al añadir", codigo: ""}
             }
         } catch (error) {   
             console.log("Error de conexion", error);
-            return false
+            return {mensaje: "Error de conexión", codigo: ""}
         }
     },
     async deleteBoletera({rootState}, boletera){

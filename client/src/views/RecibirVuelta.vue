@@ -45,6 +45,11 @@
                                                                     <v-list-item-subtitle>Total de boletos: {{item.totalBoletos}}</v-list-item-subtitle>
                                                                     <v-list-item-subtitle>Restantes: {{item.sobrantes}}</v-list-item-subtitle>
                                                                 </v-list-item-content>
+                                                                <v-list-item-action>
+                                                                    <v-btn @click="editarBoletera(item)">
+                                                                        <v-icon>mdi-pencil</v-icon>
+                                                                    </v-btn>
+                                                                </v-list-item-action>
                                                             </v-list-item>
                                                         </v-list>
                                                     </v-card>
@@ -115,7 +120,7 @@
                         <v-card  height="200" >
                             <v-card-title>Entregado</v-card-title>
                             <v-card-text>
-                                <v-text-field v-model="entregado" label="Cantidad" prefix="$" @keydown="validarTecla($event)"></v-text-field>
+                                <v-text-field v-model="entregado" label="Cantidad" prefix="$" @keydown="validarTeclaEntregado($event)"></v-text-field>
                             </v-card-text>
                         </v-card>
                     </v-col>
@@ -134,7 +139,7 @@
                 <v-btn to="/caja" color="error" >Cancelar</v-btn>
             </v-card-actions>
         </v-card>
-        <boletear v-if="modal" :ver="modal" :boletera="boleteraCobrando" v-on:cerrar="modal=false; boleteraCobrando={}; boletera=''" v-on:hecho="boleteada"></boletear>
+        <boletear v-if="modal" :ver="modal" :boletera="boleteraCobrando" v-on:cerrar="modal=false; boleteraCobrando={}; boletera=''" v-on:hecho="boleteada" v-on:editar="modificar"></boletear>
         <v-dialog v-model="auth" max-width="300" >
             <v-card>
                 <v-card-title>Ingresar contraseña</v-card-title>
@@ -147,15 +152,16 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
-        <v-dialog v-model="alertaNueva" max-width="300" persistent>
+        <v-dialog v-model="alertaNueva" max-width="600" persistent>
             <v-card>
-                <v-card-title>Vuelta Nueva</v-card-title>
+                <v-card-title>Alerta</v-card-title>
                 <v-card-text>
-                    Desea abrir una vuelta nueva
+                    ¿Que desea hacer?
                 </v-card-text>
                 <v-card-actions>
-                    <v-btn @click="boleterasNuevas()">Si</v-btn>
-                    <v-btn to="/cajaHome">No</v-btn>
+                    <v-btn @click="boleterasNuevas()">Abrir vuelta nueva</v-btn>
+                    <v-btn @click="irLiquidar()">Liquidar Chofer</v-btn>
+                    <v-btn to="cajaHome">Ir a Caja</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -178,6 +184,18 @@
                 <v-card-actions>
                     <v-btn @click="abrirNuevaBoletos()">Si</v-btn>
                     <v-btn @click="abrirNueva()">No</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-overlay v-model="loader" absolute >
+            <v-progress-circular indeterminate :size="100" :width="10"></v-progress-circular>
+        </v-overlay>
+        <v-dialog v-model="succes" max-width="400">
+            <v-card>
+                <v-card-title>Alerta</v-card-title>
+                <v-card-text>{{mensaje}}</v-card-text>
+                <v-card-actions>
+                    <v-btn @click="succes = false">Ok</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -213,7 +231,10 @@ export default {
         gastar: false,
         descripcion: "",
         montoGasto: "",
-        comentarios: ""
+        comentarios: "",
+        loader: false,
+        succes: false
+
     }),
     computed: {
         ...mapGetters({
@@ -273,9 +294,34 @@ export default {
                 even.returnValue=false
             }
         },
+        validarTeclaEntregado(even){
+            if(isNaN(even.key) && even.key!="." && even.keyCode!=8){
+                even.returnValue= false
+            }
+            else if(even.key=="." && this.entregado.includes(".")){
+                even.returnValue=false
+            }
+        },
+        irLiquidar(){
+            this.$router.push({name: "pagarReporte", params: {id: this.vuelta.turno}})
+        },
         prepararBoletera(){
             this.boleteraCobrando = this.vuelta.boleteras.find(el => el.codigo==this.boletera)
             this.modal = true
+        },
+        editarBoletera(boletera){
+            this.boleteraCobrando = {
+                codigo: boletera.codigo,
+                totalBoletos: boletera.totalBoletos + boletera.sobrantes,
+                boletos: boletera.boletos
+            }
+            this.modal = true
+        },
+        modificar(tickets){
+            this.modal = false
+            this.boleteraCobrando = {}
+            this.boletera = ""
+            this.boleterasCobradas.splice(this.boleterasCobradas.findIndex(el => tickets.codigo==el.codigo),1,tickets)
         },
         boleteada(tickets){
             this.modal = false
@@ -284,11 +330,13 @@ export default {
             this.boleterasCobradas.push(Object.assign(tickets))
         },
         async cobrar(){
+            this.loader = true
             if(await this.cerrarVuelta({vuelta: this.vuelta.id, boleteras:this.boleterasCobradas, bruto: this.ventaBruta, gastosTotal: this.gastosTotal, monto: this.montoVuelta, entregado: this.entregado, gastos: this.gastos, comentarios: this.comentarios})){
-                alert("Vuelta Cerrada con éxito")
                 this.crearBoletera()
             }else{
-                alert("Error al cerrar la vuelta")
+                this.mensaje = "Error al cerrar la vuelta"
+                this.loader = false
+                this.succes = true
             }
         },
         boleterasNuevas(){
@@ -313,17 +361,23 @@ export default {
                 this.ventaTotal.forEach(el => {
                     var valor = this.boleterasCobradas.find(elem => elem.codigo==el.codigo)
                     if(valor!=undefined){
-                        nuevas.push({inicio: (parseInt(valor.boletoFinal,10)+1).toString(10), termina: el.boletoFinal, permisionario: el.codigo.substr(0,el.codigo.search('-'))})
+                        nuevas.push({inicio: (parseInt(valor.boletoFinal,10)+1).toString(10), termina: el.boletoFinal, permisionario: el.codigo.substr(0,3)})
                     }
                 })
                 for( var i=0; i<nuevas.length; i++){
                     var pet = await this.addBoletera(nuevas[i])
-                    if(pet){
-                        this.mover.push(pet)
+                    if(pet.codigo!=""){
+                        this.mover.push(pet.codigo)
+                        this.mensaje = pet.mensaje
+                        
                     }
                 }
             }
-
+            if(this.mensaje==""){
+                this.mensaje="Datos Guardados"
+            }
+            this.loader = false
+            this.succes = true
             this.alertaNueva= true
         },
         async autenticar(){

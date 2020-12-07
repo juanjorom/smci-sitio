@@ -16,12 +16,18 @@
         $GLOBALS['LOG']['Usuarios']->write("El usuario ".$validar["id"] . " tiene derechos en Cajas");
         if($validar)
         {
-            $codigo=$data->permisionario . '-' . $data->boletoInicio. '-' . date("Y-m-d");
+            $codigo=$data->permisionario . $data->boletoInicio;
             $GLOBALS["LOG"]["Usuarios"]->write("El usuario ".$validar["id"] . " esta ingresando estos boletos: Codigo: ".$codigo);
-            if($GLOBALS["DB"]->ejecutar_consulta("INSERT INTO datos_boleteras (BOLETERAS_ANADIDO, BOLETERAS_CODIGO, BOLETERAS_BOL_INI, BOLETERAS_BOL_FIN, BOLETERAS_TOTAL_BOL, BOLETERAS_ESTADO, BOLETERAS_PERMISIONARIO, BOLETERAS_BOLETOS) VALUES ({$validar['id']},'{$codigo}','{$data->boletoInicio}', '{$data->boletoFinal}', '{$data->totalBoletos}', '{$data->status}', (SELECT PERMISIONARIO_USUARIO FROM usuario_permisionario WHERE PERMISIONARIO_CLAVE ='{$data->permisionario}'), '{}')"))
+            if($GLOBALS["DB"]->ejecutar_consulta("INSERT INTO datos_boleteras (BOLETERAS_ANADIDO, BOLETERAS_CODIGO, BOLETERAS_BOL_INI, BOLETERAS_BOL_FIN, BOLETERAS_TOTAL_BOL, BOLETERAS_ESTADO, BOLETERAS_PERMISIONARIO, BOLETERAS_BOLETOS) VALUES ({$validar['id']},'{$codigo}','{$data->boletoInicio}', '{$data->boletoFinal}', '{$data->totalBoletos}', '{$data->status}',{$data->permisionario}, '{}')"))
             {
-                $boletera = $GLOBALS["DB"]->ejecutar_consulta("SELECT BOLETERAS_CODIGO, BOLETERAS_ESTADO, BOLETERAS_BOL_INI FROM datos_boleteras WHERE BOLETERAS_CODIGO = '{$codigo}' ");
-                return Array("mensaje"=> "ok", "data" => Array("codigo" => $boletera["BOLETERAS_CODIGO"], "boletoInicial" => $boletera["BOLETERAS_BOL_INI"], "monto" => $boletera["BOLETERAS_MONTO"], "estado" => $boletera["BOLETERAS_ESTADO"]));
+                $id = $GLOBALS["DB"]->id();
+                $nuevoCodigo= $codigo."-" .$id;
+                $actualizar = $GLOBALS["DB"]->ejecutar_consulta("UPDATE datos_boleteras SET BOLETERAS_CODIGO = '{$nuevoCodigo}' WHERE BOLETERAS_ID = {$id}");
+                if($actualizar)
+                {
+                    $boletera = $GLOBALS["DB"]->ejecutar_consulta("SELECT BOLETERAS_CODIGO, BOLETERAS_ESTADO, BOLETERAS_BOL_INI, (SELECT USUARIOS_NOMBRE  FROM usuario_usuarios WHERE USUARIOS_ID = BOLETERAS_PERMISIONARIO) AS PERMISIONARIO FROM datos_boleteras WHERE BOLETERAS_ID = {$id}");
+                    return Array("mensaje"=> "ok", "data" => Array("codigo" => $boletera["BOLETERAS_CODIGO"], "boletoInicial" => $boletera["BOLETERAS_BOL_INI"], "monto" => $boletera["BOLETERAS_MONTO"], "estado" => $boletera["BOLETERAS_ESTADO"], "permisionario" => $boletera["PERMISIONARIO"]));
+                }
             }
             return Array("mensaje" => "error al ingresar");
         }
@@ -42,7 +48,7 @@
         }
         if(validar_token($token))
         {
-            $consulta = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT BOLETERAS_CODIGO, BOLETERAS_BOL_INI, BOLETERAS_BOL_FIN, BOLETERAS_TOTAL_BOL, BOLETERAS_ESTADO, USUARIOS_NOMBRE FROM datos_boleteras INNER JOIN usuario_usuarios ON USUARIOS_ID=BOLETERAS_PERMISIONARIO WHERE BOLETERAS_ESTADO!='VENDIDA' AND BOLETERAS_ELIMINADA=0");
+            $consulta = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT BOLETERAS_CODIGO, BOLETERAS_BOL_INI, BOLETERAS_BOL_FIN, BOLETERAS_TOTAL_BOL, BOLETERAS_ESTADO, USUARIOS_NOMBRE FROM datos_boleteras INNER JOIN usuario_usuarios ON USUARIOS_ID=BOLETERAS_PERMISIONARIO WHERE BOLETERAS_ESTADO!='VENDIDA' AND BOLETERAS_ELIMINADA=0 ORDER BY BOLETERAS_CODIGO");
             if($consulta)
             {
                 $arreglo = Array();
@@ -72,7 +78,7 @@
             $consulta = $GLOBALS["DB"]->ejecutar_consulta("SELECT UNIDADES_PERMISIONARIO FROM datos_unidades WHERE UNIDADES_CODIGO = '{$unidad}'");
             if($consulta)
             {
-                $boleteras = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT BOLETERAS_CODIGO, BOLETERAS_BOL_INI, BOLETERAS_BOL_FIN, BOLETERAS_TOTAL_BOL, BOLETERAS_ESTADO, USUARIOS_NOMBRE FROM datos_boleteras INNER JOIN usuario_usuarios ON USUARIOS_ID=BOLETERAS_PERMISIONARIO WHERE BOLETERAS_PERMISIONARIO = {$consulta['UNIDADES_PERMISIONARIO']} AND BOLETERAS_ESTADO='NO ASIGNADA' AND BOLETERAS_ELIMINADA=0");
+                $boleteras = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT BOLETERAS_CODIGO, BOLETERAS_BOL_INI, BOLETERAS_BOL_FIN, BOLETERAS_TOTAL_BOL, BOLETERAS_ESTADO, USUARIOS_NOMBRE FROM datos_boleteras INNER JOIN usuario_usuarios ON USUARIOS_ID=BOLETERAS_PERMISIONARIO WHERE BOLETERAS_PERMISIONARIO = {$consulta['UNIDADES_PERMISIONARIO']} AND BOLETERAS_ESTADO='NO ASIGNADA' AND BOLETERAS_ELIMINADA=0 ORDER BY BOLETERAS_CODIGO");
                 if($boleteras)
                 {
                     $regreso = Array();
@@ -104,13 +110,13 @@
         }
         if(validar_token($token))
         {
-            $consulta= $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT USUARIOS_NOMBRE, PERMISIONARIO_CLAVE FROM usuario_usuarios INNER JOIN usuario_permisionario ON PERMISIONARIO_USUARIO=USUARIOS_ID WHERE USUARIOS_TIPO=4");
+            $consulta= $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT USUARIOS_ID, USUARIOS_NOMBRE FROM usuario_usuarios WHERE USUARIOS_TIPO = 4 ORDER BY USUARIOS_NOMBRE");
             if($consulta)
             {
                 $arreglo = Array();
                 foreach($consulta as $actual)
                 {
-                    array_push($arreglo, Array("nombre" => $actual['USUARIOS_NOMBRE'], "clave" => $actual['PERMISIONARIO_CLAVE']));
+                    array_push($arreglo, Array("nombre" => $actual['USUARIOS_NOMBRE'], "clave" => $actual['USUARIOS_ID']));
                 }
                 return Array("mensaje" => "ok", "data" => $arreglo);
             }
@@ -223,7 +229,7 @@
 
         if($validar)
         {
-            $valores = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT VUELTAS_ID, VUELTAS_FECHA_HORA_INICIO AS FECHA_HORA, (SELECT UNIDADES_NOMBRE FROM datos_unidades WHERE UNIDADES_ID=VUELTAS_UNIDAD) AS UNIDAD, (SELECT RUTAS_RUTA FROM datos_rutas WHERE RUTAS_ID=VUELTAS_RUTA) AS RUTA , (SELECT USUARIOS_NOMBRE FROM usuario_usuarios WHERE USUARIOS_ID=VUELTAS_CHOFER) AS CHOFER, VUELTAS_NUMERO AS NUMERO, VUELTAS_COMENTARIOS FROM datos_vueltas WHERE VUELTAS_ESTADO='ABIERTA'");
+            $valores = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT VUELTAS_ID, VUELTAS_FECHA_HORA_INICIO AS FECHA_HORA, (SELECT UNIDADES_NOMBRE FROM datos_unidades WHERE UNIDADES_ID=VUELTAS_UNIDAD) AS UNIDAD, (SELECT RUTAS_RUTA FROM datos_rutas WHERE RUTAS_ID=VUELTAS_RUTA) AS RUTA , (SELECT USUARIOS_NOMBRE FROM usuario_usuarios WHERE USUARIOS_ID=VUELTAS_CHOFER) AS CHOFER, VUELTAS_TURNO AS TURNO, VUELTAS_NUMERO AS NUMERO, VUELTAS_COMENTARIOS FROM datos_vueltas WHERE VUELTAS_ESTADO='ABIERTA' ORDER BY FECHA_HORA");
             if($valores)
             {
                 $arreglo = Array();
@@ -238,7 +244,7 @@
                             array_push($arr, Array("codigo" => $esta["BOLETERAS_CODIGO"], "boletoInicial" => $esta["BOLETERAS_BOL_INI"], "boletoFinal" => $esta["BOLETERAS_BOL_FIN"], "totalBoletos" => $esta["BOLETERAS_TOTAL_BOL"]));
                         }
                     }
-                    array_push($arreglo, Array("id" => $actual["VUELTAS_ID"], "fechaHora" => $actual["FECHA_HORA"], "unidad" => $actual["UNIDAD"], "ruta" => $actual["RUTA"], "chofer" => $actual["CHOFER"], "numero" => $actual["NUMERO"] , "comentarios" => $actual["VUELTAS_COMENTARIOS"], "boleteras" => $arr));
+                    array_push($arreglo, Array("id" => $actual["VUELTAS_ID"], "fechaHora" => $actual["FECHA_HORA"], "unidad" => $actual["UNIDAD"], "ruta" => $actual["RUTA"], "chofer" => $actual["CHOFER"],"turno" => $actual["TURNO"],  "numero" => $actual["NUMERO"] , "comentarios" => $actual["VUELTAS_COMENTARIOS"], "boleteras" => $arr));
                 }
                 return Array("mensaje" => "ok", "data" => $arreglo);
             }
@@ -265,7 +271,7 @@
 
         if($validar)
         {
-            $valores = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT VUELTAS_ID, VUELTAS_FECHA_HORA_INICIO AS FECHA_HORA, (SELECT UNIDADES_NOMBRE FROM datos_unidades WHERE UNIDADES_ID=VUELTAS_UNIDAD) AS UNIDAD, (SELECT RUTAS_RUTA FROM datos_rutas WHERE RUTAS_ID=VUELTAS_RUTA) AS RUTA , (SELECT USUARIOS_NOMBRE FROM usuario_usuarios WHERE USUARIOS_ID=VUELTAS_CHOFER) AS CHOFER, VUELTAS_NUMERO AS NUMERO, VUELTAS_COMENTARIOS FROM datos_vueltas WHERE VUELTAS_ESTADO='ABIERTA' AND VUELTAS_UNIDAD = (SELECT UNIDADES_ID FROM datos_unidades WHERE UNIDADES_CODIGO = '{$unidad}'");
+            $valores = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT VUELTAS_ID, VUELTAS_FECHA_HORA_INICIO AS FECHA_HORA, (SELECT UNIDADES_NOMBRE FROM datos_unidades WHERE UNIDADES_ID=VUELTAS_UNIDAD) AS UNIDAD, (SELECT RUTAS_RUTA FROM datos_rutas WHERE RUTAS_ID=VUELTAS_RUTA) AS RUTA , (SELECT USUARIOS_NOMBRE FROM usuario_usuarios WHERE USUARIOS_ID=VUELTAS_CHOFER) AS CHOFER, VUELTAS_NUMERO AS NUMERO, VUELTAS_COMENTARIOS FROM datos_vueltas WHERE VUELTAS_ESTADO='ABIERTA' AND VUELTAS_UNIDAD = (SELECT UNIDADES_ID FROM datos_unidades WHERE UNIDADES_CODIGO = '{$unidad}') ORDER BY FECHA_HORA");
             if($valores)
             {
                 $arreglo = Array();
@@ -366,7 +372,7 @@
 
         if($validar)
         {
-            $valores = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT TURNOS_ID, (SELECT UNIDADES_NOMBRE FROM datos_unidades WHERE UNIDADES_ID = TURNOS_UNIDAD) AS UNIDAD, (SELECT USUARIOS_NOMBRE FROM usuario_usuarios WHERE USUARIOS_ID = TURNOS_CHOFER) AS CHOFER, (SELECT RUTAS_RUTA FROM datos_rutas WHERE RUTAS_ID = TURNOS_RUTA) AS RUTA , TURNOS_VUELTAS, TURNOS_INICIO FROM datos_turnos WHERE TURNOS_ESTADO = 'ABIERTO'");
+            $valores = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT TURNOS_ID, (SELECT UNIDADES_NOMBRE FROM datos_unidades WHERE UNIDADES_ID = TURNOS_UNIDAD) AS UNIDAD, (SELECT USUARIOS_NOMBRE FROM usuario_usuarios WHERE USUARIOS_ID = TURNOS_CHOFER) AS CHOFER, (SELECT RUTAS_RUTA FROM datos_rutas WHERE RUTAS_ID = TURNOS_RUTA) AS RUTA , TURNOS_VUELTAS, TURNOS_INICIO FROM datos_turnos WHERE TURNOS_ESTADO = 'ABIERTO' ORDER BY TURNOS_INICIO");
             if($valores)
             {
                 $arra = Array();

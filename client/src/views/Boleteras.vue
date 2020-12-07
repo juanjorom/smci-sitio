@@ -70,6 +70,8 @@ export default {
     beforeMount(){
         if(this.logeado==null && this.sesion==false){
             this.$router.push('login')
+        }else{
+            this.getBoleteras()
         }
     },
     data: () => ({
@@ -83,9 +85,6 @@ export default {
         filtros: ["COBRADA", "NO ASIGNADA", "ASIGNADA", "TODAS"],
         filtro: ""
     }),
-    mounted(){
-        this.getBoleteras()
-    },
     computed:{
         ...mapGetters({
             allBoleteras: 'cajeras/getAllBoleteras',

@@ -52,10 +52,9 @@ export default {
     beforeMount(){
         if(this.logeado==null && this.sesion==false){
         this.$router.push('login')
+        }else{
+            this.obtenerVueltas()
         }
-    },
-    mounted() {
-        this.obtenerVueltas()
     },
     data: () => ({
         buscar: "",
@@ -89,20 +88,20 @@ export default {
             }
         },
         abrir(){
-            this.$router.push('abrirVuelta')
+            this.$router.push({name:'abrirVuelta'})
         },
         cerrar(){
-            this.$router.push('recibirVuelta')
+            this.$router.push({name:'recibirVuelta'})
         },
         liquidar(){
-            this.$router.push('liquidarTurno')
+            this.$router.push({name:'liquidarTurno'})
         },
         async validarPassword(){
             if(this.password!=""){
                 if(await this.validar(this.password)){
                     this.password=""
                     this.modal=false
-                    this.$router.push("recibirVuelta/"+this.id)
+                    this.$router.push({name: "recibirVuelta",params: {id:this.id}})
                 }
                 else{
                     alert("Contraseña no valida")

@@ -30,7 +30,7 @@ export default {
       {
         propiedad: "Gastos totales",
         cantidad: "700",
-        prefijo: ""
+        prefijo: "$"
       },
       {
         propiedad: "Vueltas Abiertas",

@@ -52,6 +52,12 @@
                 case "openLap":
                     $RESPUESTA = abrir_vuelta($datos);
                 break;
+                case "addModulo":
+                    $RESPUESTA = add_modulo($datos);
+                break;
+                case "addUnidad":
+                    $RESPUESTA = add_unidad($datos);
+                break;
                 default:
                     $RESPUESTA= Array("mensaje" => "Recurso no existe");
                 break;
@@ -99,6 +105,12 @@
                 break;
                 case "getBoleterasAsignar":
                     $RESPUESTA = get_boleteras_asignables($_GET["token"], $_GET["unidad"]);
+                break;
+                case "getPermisos":
+                    $RESPUESTA = get_permisos_usuario($_GET["token"]);
+                break;
+                case "getRoles":
+                    $RESPUESTA = get_roles($_GET["token"]);
                 break;
                 default;
                     $RESPUESTA= Array("mensaje" => "Recurso no existe");

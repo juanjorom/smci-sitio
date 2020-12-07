@@ -31,9 +31,9 @@
     </v-app-bar> 
     <v-navigation-drawer v-if="logeado" v-model="mostrar" app clipped>
       <v-list>
-        <v-list-item><v-btn text to="/dashboard">Dashboard</v-btn> </v-list-item>
-        <v-list-item><v-btn text to="/caja">Caja</v-btn></v-list-item>
-        <v-list-item><v-btn text to="/boleteras">Boletera</v-btn></v-list-item>
+        <v-list-item v-for="(ruta, index) in permisos" :key="index"><v-btn text :to="ruta.ruta">{{ruta.modulo}}</v-btn> </v-list-item>
+        <!--<v-list-item><v-btn text to="/caja">Caja</v-btn></v-list-item>
+        <v-list-item><v-btn text to="/boleteras">Boletera</v-btn></v-list-item>-->
       </v-list>
     </v-navigation-drawer>
     <v-main>
@@ -46,26 +46,32 @@
 import {mapActions, mapGetters} from 'vuex'
 export default {
   name: 'App',
-
   components: {
     
   },
+  watch: {
+    logeado: function(){
+      this.traerPermisos()
+    }
+  },
   computed: {
-    ...mapGetters('logdata', {
-      logeado: 'getSucess',
-      mensaje: 'getMensaje'
+    ...mapGetters({
+      logeado: 'logdata/getSucess',
+      mensaje: 'logdata/getMensaje',
+      permisos: 'appdata/getAccesos'
     })
   },
   data: () => ({
     //
     opcion: null,
     mostrar: true,
-    opciones: [{name:"Cerrar Sesion", value: "closeSesion", icon: "mdi-door"}]
+    opciones: [{name:"Cambiar Contraseña", value: "changePassword", icon: "mdi-key"}, {name:"Cerrar Sesion", value: "closeSesion", icon: "mdi-door"}]
   }),
 
   methods: {
     ...mapActions({
-      cerrar: 'logdata/closeSesion'
+      cerrar: 'logdata/closeSesion',
+      traerPermisos: 'appdata/getAccesosServer'
     }),
     action(accion){
       if(accion=="closeSesion")

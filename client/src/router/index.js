@@ -15,23 +15,36 @@ import RecibirVuelta from '@/views/RecibirVuelta'
 import CajaHome from '@/views/CajaHome'
 import liquidarTurno from '@/views/LiquidarChofer'
 import PagarReporte from '@/views/pagarReporte'
+import Usuarios from '@/views/Usuarios'
+import Unidades from '@/views/Unidades'
+import Modulos from '@/views/Modulos'
 
 Vue.use(Router)
 
 const routes= [
     {
         path: '/',
-        redirect: '/login'
+        redirect: '/login',
+        meta:{
+            title: "Admin Bus"
+        }
     },
     {
         path: '/login',
         name: 'login',
-        component: Login
+        component: Login,
+        meta:{
+            title: "Inicia Sesión - Admin Bus"
+        }
+        
     },
     {
         path: "/dashboard",
         name: "dashboard",
-        component: Dashboard
+        component: Dashboard,
+        meta:{
+            title: "Dashboard - Admin Bus"
+        }
     },
     {
         path: "/papeleta",
@@ -65,33 +78,49 @@ const routes= [
     },
     {
         path: "/caja",
+        name: "caja",
         component: Caja,
         children: [
             {
                 path: 'cajaHome',
                 name: 'cajaHome',
-                component: CajaHome
+                component: CajaHome,
+                meta:{
+                    title: "Caja - Admin Bus"
+                }
             },
             {
                 path: 'abrirVuelta',
                 name: 'abrirVuelta',
                 params: '',
-                component: AbrirVuelta
+                component: AbrirVuelta,
+                meta:{
+                    title: "Abrir Vuelta - Admin Bus"
+                }
             },
             {
-                path: 'recibirVuelta/:id',
+                path: 'recibirVuelta/',
                 name: 'recibirVuelta',
-                component: RecibirVuelta
+                component: RecibirVuelta,
+                meta:{
+                    title: "Recibir Vuelta - Admin Bus"
+                }
             },
             {
                 path: 'liquidarTurno',
                 name: 'liquidarTurno',
-                component: liquidarTurno
+                component: liquidarTurno,
+                meta:{
+                    title: "Liquidar  - Admin Bus"
+                }
             },
             {
                 path: 'pagarReporte',
                 name: 'pagarReporte',
-                component: PagarReporte
+                component: PagarReporte,
+                meta:{
+                    title: "Pagar Chofer - Admin Bus"
+                }
             },
             {
                 path: '/',
@@ -100,10 +129,26 @@ const routes= [
         ]
     },
     {
+        path: '/usuarios',
+        name: 'usuarios',
+        component: Usuarios
+    },
+    {
+        path: '/unidades',
+        name: 'unidades',
+        component: Unidades
+    },
+    {
+        path: '/modulos',
+        name: 'modulos',
+        component: Modulos
+    },
+    {
         path: '*',
-        redirect: '/dashboard'
+        redirect: '/dashboard',
     }
 ]
+
 
 const router= new Router({
     routes

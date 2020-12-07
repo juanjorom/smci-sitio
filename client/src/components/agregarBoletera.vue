@@ -14,11 +14,23 @@
             <v-card>
                 <v-card-title>Ingrese su contraseña</v-card-title>
                 <v-card-text>
-                    <v-text-field v-model="password" label="Contraseña" placeholder="Contraseña" type="password"></v-text-field>
+                    <v-text-field v-model="password" label="Contraseña" placeholder="Contraseña" type="password" @keydown="isEnter($event)"></v-text-field>
                 </v-card-text>
                 <v-card-actions>
                     <v-btn @click="validarPassword">Ok</v-btn>
                     <v-btn @click="modal=false">Cancelar</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-overlay v-model="loader" absolute >
+            <v-progress-circular indeterminate :size="100" :width="10"></v-progress-circular>
+        </v-overlay>
+        <v-dialog v-model="succes" max-width="400">
+            <v-card>
+                <v-card-title>Alerta</v-card-title>
+                <v-card-text>{{mensaje}}</v-card-text>
+                <v-card-actions>
+                    <v-btn @click="succes = false">Ok</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -34,7 +46,9 @@ export default {
         inicia: "",
         termina: "",
         permisionarioSelected: "",
-        
+        loader: false,
+        mensaje: "",
+        succes: false
     }),
     mounted(){
         this.pedirPermisionarios()
@@ -64,6 +78,7 @@ export default {
             this.$emit('cerrar')
         },
         async validarPassword(){
+            this.loader= true
             if(this.password!=""){
                 if(await this.validar(this.password)){
                     this.password=""
@@ -71,29 +86,45 @@ export default {
                     this.agregarBoletera()
                 }
                 else{
-                    alert("Contraseña no valida")
+                    this.mensaje = "Contraseña no valida"
+                    this.loader = false
+                    this.succes = true
                     this.password=""
                 }
             }else{
-                alert("Escriba la contraseña")
+                this.mensaje= "Escriba la contraseña"
+                this.loader= false
+                this.succes= true
             }
         },
-        agregarBoletera(){
+        isEnter(event){
+            if(event.key=="Enter"){
+                this.validarPassword()
+            }
+        },
+        async agregarBoletera(){
             if(this.inicia!="" && this.permisionarioSelected!="" && this.termina!="")
             {
                 if(parseInt(this.termina,10) >= parseInt(this.inicia,10)){
-                    this.addBoletera({inicio: this.inicia, termina: this.termina, permisionario:this.permisionarioSelected})
+                    this.mensaje= await this.addBoletera({inicio: this.inicia, termina: this.termina, permisionario:this.permisionarioSelected})
+                    this.mensaje= this.mensaje.mensaje
                     this.termina="",
                     this.inicia="",
                     this.permisionarioSelected=""
                     this.modal=false
+                    this.loader= false,
+                    this.succes= true
                 }else{
-                    alert("EL numero donde termina debe ser mayor que donde inicia")
+                    this.mensaje = "EL numero donde termina debe ser mayor que donde inicia"
+                    this.loader= false
+                    this.succes= true
                 }
             }
             else
             {
-                alert("Por favor inserta un numero válido")
+                this.mensaje = "Por favor inserta un numero válido"
+                this.loader= false
+                this.succes = true
             }
             this.modal=false
         }

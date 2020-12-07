@@ -84,8 +84,9 @@
                     </v-row>
                     <v-row>
                         <v-col col="2">
-                            <v-btn color="success" @click="prepararPdf()">Imprimir</v-btn>
+                            <!--<v-btn color="success" @click="prepararPdf()">Imprimir</v-btn>-->
                             <v-btn color="success" @click="modal=true">Cerrar</v-btn>
+                            <v-btn color="error" to="cajaHome">Cancelar</v-btn>
                         </v-col>
                     </v-row>
                 </v-col>
@@ -114,6 +115,15 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog v-model="siguiente" max-width="400">
+            <v-card>
+                <v-card-title>¿Desea abrir una vuelta nueva?</v-card-title>
+                <v-card-actions>
+                    <v-btn color="success" :to="{name: 'abrirVuelta', params: {unidad: this.turno.unidad, chofer: this.turno.chofer, ruta: this.turno.ruta}}" >Si</v-btn>
+                    <v-btn color="error" to="cajaHome">No</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </v-container>
 </template>
 
@@ -138,6 +148,7 @@ export default {
         sel: "",
         montoGasto: '',
         descripcion: '',
+        siguiente: false,
         headers:[
             {
                 text: 'Vuelta',
@@ -293,7 +304,7 @@ export default {
             gastoLocal.push({descripcion: "Gastos de Vuelta", monto:this.gastosTotal},{descripcion: "Comision Chofer", monto: this.comisionTotal})
             if(await this.pagar({id: this.$route.params.id, venta: this.ventaBruta, recaudado: this.ventaTotal, comision: this.comisionTotal, boletos: this.boletosTotal, totalGastos: this.gastosAdmin, gastos: gastoLocal})){
                 alert("Se guardo la información")
-                this.$router.push({name: 'liquidarTurno'})
+                this.siguiente= true
             }else{
                 alert("Error al guardar")
             }
@@ -333,5 +344,4 @@ export default {
 </script>
 
 <style>
-
 </style>

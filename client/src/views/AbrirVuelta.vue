@@ -5,17 +5,17 @@
               Abrir una vuelta nueva
           </v-card-title>
           <v-card-text>
-              <v-menu max-width="150" offset-y>
+              <v-menu max-width="150" offset-y  max-height="300">
                   <template v-slot:activator="{on, attrs}">
                       <v-text-field v-model="unidad" label="Unidad" v-bind="attrs" v-on="on" @blur="opacar('unidades', 'unidad')"></v-text-field>
                   </template>
-                  <v-list v-model="unidadCodigo">
+                  <v-list v-model="unidadCodigo" >
                       <v-list-item v-for="(item, index) in unidades" :key="index" @click="unidad=item.nombre; unidadCodigo=item.codigo" >
                           <v-list-item-title>{{item.nombre}}</v-list-item-title>
                       </v-list-item>
                   </v-list>
               </v-menu>
-              <v-menu  max-width="300" offset-y>
+              <v-menu  max-width="300" offset-y max-height="300">
                   <template v-slot:activator="{on, attrs}">
                       <v-text-field v-model="chofer" label="Chofer" v-bind="attrs" v-on="on" @blur="opacar('choferes', 'chofer')"></v-text-field>
                   </template>
@@ -27,7 +27,7 @@
               </v-menu>
               <v-row>
                   <v-col cols="5">
-                    <v-menu ref="menu" v-model="menu" :close-on-content-click="false" :return-value.sync="date" transition="scale-transition" offset-y min-width="290px">
+                    <v-menu ref="menu" v-model="menu" :close-on-content-click="false" :return-value.sync="date" transition="scale-transition" offset-y min-width="290px" max-height="300">
                         <template v-slot:activator="{ on, attrs }">
                             <v-text-field v-model="date" label="Fecha" prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on"></v-text-field>
                         </template>
@@ -97,8 +97,17 @@
             </v-card>
         </v-dialog>
         <v-overlay v-model="loader" absolute >
-                    <v-progress-circular indeterminate :size="100" :width="10"></v-progress-circular>
+            <v-progress-circular indeterminate :size="100" :width="10"></v-progress-circular>
         </v-overlay>
+        <v-dialog v-model="succes" max-width="400">
+            <v-card>
+                <v-card-title>Alerta</v-card-title>
+                <v-card-text>{{mensaje}}</v-card-text>
+                <v-card-actions>
+                    <v-btn @click="succes = false">Ok</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
   </v-container>
 </template>
 
@@ -118,7 +127,9 @@ export default {
         boleterasAsignadas: [],
         confirmar: false,
         password: "",
-        loader: false
+        loader: false,
+        mensaje: "",
+        succes: false
     }),
     beforeMount(){
         if(this.logeado==null && this.sesion==false){
@@ -139,7 +150,9 @@ export default {
             this.unidad = this.$route.params.unidad
             this.choferCodigo = this.allChoferes.find(el => el.nombre == this.$route.params.chofer).nickname
             this.chofer = this.$route.params.chofer
-            this.ruta = this.allRutas.find(el => el.ruta==this.$route.params.ruta).codigo
+            if(this.$route.params.ruta!=undefined){
+                this.ruta = this.allRutas.find(el => el.ruta==this.$route.params.ruta).codigo
+            }
             if(this.$route.params.boleteras.length>0){
                 this.boleterasAsignadas= this.$route.params.boleteras
             }
@@ -220,7 +233,7 @@ export default {
                     this.confirmar=false
                     this.loader=true
                     if(await this.iniciarVuelta({unidad: this.unidadCodigo, fechaHora: this.date+' '+this.hora+':00', chofer: this.choferCodigo, ruta: this.ruta, boleteras: this.boleterasAsignadas})){
-                        alert("Vuelta Abierta con éxito")
+                        this.mensaje = "Vuelta Abierta con éxito"
                         this.unidad=""
                         this.unidadCodigo=""
                         this.hora=""
@@ -228,11 +241,15 @@ export default {
                         this.choferCodigo=""
                         this.ruta=""
                         this.boleterasAsignadas=[]
+                        this.loader= false
+                        this.succes = true
                     }
                     else{
-                        alert("Error al Abrir la vuelta")
+                        this.mensaje = "Error al Abrir la vuelta"
+                        this.loader = false
+                        this.succes = true
+
                     }
-                    this.loader=false
                 }
                 else{
                     alert("Contraseña no valida")

@@ -14,7 +14,7 @@
                       <v-list-item-content>
                             <v-list-item-title>{{tur.unidad}} Vueltas: {{tur.vueltas}} Chofer: {{tur.chofer}}</v-list-item-title>
                             <v-list-item-subtitle>
-                                Hora Inicio: {{tur.inicio}} Ruta: {{tur.ruta}}  Total: {{tur.montoTotal}}
+                                Hora Inicio: {{tur.inicio}} Ruta: {{tur.ruta}}
                             </v-list-item-subtitle>
                       </v-list-item-content>
                       <v-list-item-action>
@@ -46,12 +46,12 @@
 import { mapActions, mapGetters } from 'vuex'
 export default {
   beforeMount(){
-        if(this.logeado==null && this.sesion==false){
-            this.$router.push('login')
-        }
-    },
-  mounted(){
-    this.traerTurnos()
+    if(this.logeado==null && this.sesion==false){
+        this.$router.push('login')
+    }
+    else{
+      this.traerTurnos()
+    }
   },
   data: () => ({
     modal: false,

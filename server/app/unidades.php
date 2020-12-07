@@ -15,12 +15,12 @@
         $validar = validar_token($token);
         if($validar)
         {
-            $consulta=$GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT UNIDADES_CODIGO, UNIDADES_NOMBRE FROM datos_unidades WHERE UNIDADES_ELIMINADA=0");
+            $consulta=$GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT UNIDADES_CODIGO, UNIDADES_NOMBRE,(SELECT USUARIOS_NOMBRE FROM usuario_usuarios WHERE USUARIOS_ID = UNIDADES_PERMISIONARIO) AS PERMISIONARIO FROM datos_unidades WHERE UNIDADES_ELIMINADA = 0 ORDER BY UNIDADES_NOMBRE");
             $arr = Array();
             if($consulta){
                 foreach($consulta as $actual)
                 {
-                    array_push($arr, Array("codigo" => $actual['UNIDADES_CODIGO'], "nombre" => $actual["UNIDADES_NOMBRE"]));
+                    array_push($arr, Array("codigo" => $actual['UNIDADES_CODIGO'], "nombre" => $actual["UNIDADES_NOMBRE"], "permisionario" => $actual["PERMISIONARIO"]));
                 }
                 return Array("mensaje" => "ok", "data" => $arr);
             }
@@ -57,5 +57,31 @@
             return Array("mensaje" => "Sin datos");
         }
         return Array("mensaje" => "error");
+    }
+
+    /**
+     * Funcion para agregar unidad
+     * 
+     * @param Object $datos Objeto con los valores de la unidad
+     * @return Array Array con los datos solicitados
+     * 
+     * @author Juanjo Romero
+     */
+    function add_unidad($datos)
+    {
+        if(!validar_parametros_option($datos, ["token", "nombre","codigo","permisionario"], 4))
+        {
+            return Array("mensaje" => "error");
+        }
+        $validar = validar_token($datos->token);
+        if($validar)
+        {
+            $consulta = $GLOBALS["DB"]->ejecutar_consulta("INSERT INTO datos_unidades (UNIDADES_ANADIDO, UNIDADES_CODIGO, UNIDADES_NOMBRE, UNIDADES_PERMISIONARIO) VALUES ({$validar['id']}, '{$datos->codigo}', '{$datos->nombre}', {$datos->permisionario})");
+            if($consulta)
+            {
+                return Array("mensaje" => "ok");
+            }
+        }
+        return Array("mensaje" => "error interno");
     }
 ?>
