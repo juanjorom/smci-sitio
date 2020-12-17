@@ -98,6 +98,7 @@ export default {
         ...mapGetters({
             unidades: 'cajeras/getAllUnidades',
             permisionarios: 'cajeras/getPermisionarios',
+            logeado: 'logdata/getKey',
             sesion: 'logdata/getSucess',
             roles: 'admin/getRoles',
         })

@@ -98,6 +98,7 @@
                 <v-card-text>
                     <v-select :items="['DIESEL', 'OTRO']" v-model="sel" label="Seleccione"></v-select>
                     <v-text-field v-if="sel=='OTRO'" label="Especifique" v-model="descripcion"></v-text-field>
+                    <v-text-field v-else-if="sel=='DIESEL'" label="Cantidad" type="number" v-model="cantidad"></v-text-field>
                     <v-text-field label="Monto" v-model="montoGasto" @keydown="validarTecla($event)" prefix="$"></v-text-field>
                     <v-btn @click="addGasto()">Ok</v-btn>
                     <v-btn @click="gastar=false; sel=''; descripcion=''; montoGasto='';">Cancelar</v-btn>
@@ -149,6 +150,7 @@ export default {
         montoGasto: '',
         descripcion: '',
         siguiente: false,
+        cantidad: "",
         headers:[
             {
                 text: 'Vuelta',
@@ -202,14 +204,14 @@ export default {
         ventaTotal(){
             var cant= 0
             this.turno.vueltas.forEach(element => {
-                cant+= parseFloat(element.monto)
+                cant+= parseFloat(element.monto.substr(1))
             });
             return cant-this.comisionTotal
         },
         comisionTotal(){
             var cant= 0
             this.turno.vueltas.forEach(element => {
-                cant+= parseFloat(element.comision)
+                cant+= parseFloat(element.comision.substr(1))
             });
             return cant
         },
@@ -223,21 +225,21 @@ export default {
         adeudos(){
             var cant= 0
             this.turno.vueltas.forEach(element => {
-                cant+= parseFloat(element.diferencia)
+                cant+= parseFloat(element.diferencia.substr(1))
             });
             return cant
         },
         ventaBruta(){
             var cant = 0
             this.turno.vueltas.forEach(element => {
-                cant+=parseFloat(element.bruto)
+                cant+=parseFloat(element.bruto.substr(1))
             })
             return cant
         },
         gastosTotal(){
             var cant= 0
             this.turno.vueltas.forEach(element => {
-                cant+= parseFloat(element.gastos)
+                cant+= parseFloat(element.gastos.substr(1))
             })
             return cant
         },
@@ -266,10 +268,10 @@ export default {
         },
         addGasto(){
             if(this.sel!="OTRO"){
-                this.gastos.push({monto: this.montoGasto, descripcion: this.sel.toUpperCase()})
+                this.gastos.push({cantidad: this.turno.totalVueltas, monto: this.montoGasto, descripcion: this.sel.toUpperCase()})
             }
             else{
-                this.gastos.push({monto: this.montoGasto, descripcion: this.descripcion.toUpperCase()})
+                this.gastos.push({cantidad: this.cantidad,  monto: this.montoGasto, descripcion: this.descripcion.toUpperCase()})
             }
             this.montoGasto="",
             this.descripcion=""
@@ -301,7 +303,7 @@ export default {
         },
         async prepararPago(){
             var gastoLocal= this.gastos
-            gastoLocal.push({descripcion: "Gastos de Vuelta", monto:this.gastosTotal},{descripcion: "Comision Chofer", monto: this.comisionTotal})
+            gastoLocal.push({cantidad: this.turno.totalVueltas, descripcion: "Gastos de Vuelta", monto:this.gastosTotal},{cantidad: this.turno.totalVueltas, descripcion: "Comision Chofer", monto: this.comisionTotal})
             if(await this.pagar({id: this.$route.params.id, venta: this.ventaBruta, recaudado: this.ventaTotal, comision: this.comisionTotal, boletos: this.boletosTotal, totalGastos: this.gastosAdmin, gastos: gastoLocal})){
                 alert("Se guardo la información")
                 this.siguiente= true

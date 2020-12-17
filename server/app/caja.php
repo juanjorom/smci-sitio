@@ -235,13 +235,13 @@
                 $arreglo = Array();
                 foreach($valores as $actual)
                 {
-                    $boleteras = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT BOLETERAS_CODIGO, BOLETERAS_BOL_INI, BOLETERAS_BOL_FIN, BOLETERAS_TOTAL_BOL FROM datos_boleteras WHERE BOLETERAS_VUELTA={$actual['VUELTAS_ID']} AND BOLETERAS_ELIMINADA=0");
+                    $boleteras = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT BOLETERAS_CODIGO, BOLETERAS_BOL_INI, BOLETERAS_BOL_FIN, BOLETERAS_TOTAL_BOL, BOLETERAS_PERMISIONARIO FROM datos_boleteras WHERE BOLETERAS_VUELTA={$actual['VUELTAS_ID']} AND BOLETERAS_ELIMINADA=0");
                     if($boleteras)
                     {
                         $arr= Array();
                         foreach($boleteras as $esta)
                         {
-                            array_push($arr, Array("codigo" => $esta["BOLETERAS_CODIGO"], "boletoInicial" => $esta["BOLETERAS_BOL_INI"], "boletoFinal" => $esta["BOLETERAS_BOL_FIN"], "totalBoletos" => $esta["BOLETERAS_TOTAL_BOL"]));
+                            array_push($arr, Array("codigo" => $esta["BOLETERAS_CODIGO"], "boletoInicial" => $esta["BOLETERAS_BOL_INI"], "boletoFinal" => $esta["BOLETERAS_BOL_FIN"], "totalBoletos" => $esta["BOLETERAS_TOTAL_BOL"], "permisionario" => $esta["BOLETERAS_PERMISIONARIO"]));
                         }
                     }
                     array_push($arreglo, Array("id" => $actual["VUELTAS_ID"], "fechaHora" => $actual["FECHA_HORA"], "unidad" => $actual["UNIDAD"], "ruta" => $actual["RUTA"], "chofer" => $actual["CHOFER"],"turno" => $actual["TURNO"],  "numero" => $actual["NUMERO"] , "comentarios" => $actual["VUELTAS_COMENTARIOS"], "boleteras" => $arr));
@@ -271,24 +271,22 @@
 
         if($validar)
         {
-            $valores = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT VUELTAS_ID, VUELTAS_FECHA_HORA_INICIO AS FECHA_HORA, (SELECT UNIDADES_NOMBRE FROM datos_unidades WHERE UNIDADES_ID=VUELTAS_UNIDAD) AS UNIDAD, (SELECT RUTAS_RUTA FROM datos_rutas WHERE RUTAS_ID=VUELTAS_RUTA) AS RUTA , (SELECT USUARIOS_NOMBRE FROM usuario_usuarios WHERE USUARIOS_ID=VUELTAS_CHOFER) AS CHOFER, VUELTAS_NUMERO AS NUMERO, VUELTAS_COMENTARIOS FROM datos_vueltas WHERE VUELTAS_ESTADO='ABIERTA' AND VUELTAS_UNIDAD = (SELECT UNIDADES_ID FROM datos_unidades WHERE UNIDADES_CODIGO = '{$unidad}') ORDER BY FECHA_HORA");
+            $valores = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT VUELTAS_ID, VUELTAS_FECHA_HORA_INICIO AS FECHA_HORA, (SELECT UNIDADES_NOMBRE FROM datos_unidades WHERE UNIDADES_ID = VUELTAS_UNIDAD) AS UNIDAD, (SELECT RUTAS_RUTA FROM datos_rutas WHERE RUTAS_ID=VUELTAS_RUTA) AS RUTA , (SELECT USUARIOS_NOMBRE FROM usuario_usuarios WHERE USUARIOS_ID=VUELTAS_CHOFER) AS CHOFER, VUELTAS_NUMERO AS NUMERO, VUELTAS_COMENTARIOS FROM datos_vueltas WHERE VUELTAS_ESTADO='ABIERTA' AND VUELTAS_UNIDAD = (SELECT UNIDADES_ID FROM datos_unidades WHERE UNIDADES_NOMBRE LIKE '%{$unidad}%' LIMIT 1) ORDER BY FECHA_HORA");
             if($valores)
             {
-                $arreglo = Array();
+                $arr = Array();
                 foreach($valores as $actual)
                 {
                     $boleteras = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT BOLETERAS_CODIGO, BOLETERAS_BOL_INI, BOLETERAS_BOL_FIN, BOLETERAS_TOTAL_BOL FROM datos_boleteras WHERE BOLETERAS_VUELTA={$actual['VUELTAS_ID']} AND BOLETERAS_ELIMINADA=0");
                     if($boleteras)
                     {
-                        $arr= Array();
                         foreach($boleteras as $esta)
                         {
                             array_push($arr, Array("codigo" => $esta["BOLETERAS_CODIGO"], "boletoInicial" => $esta["BOLETERAS_BOL_INI"], "boletoFinal" => $esta["BOLETERAS_BOL_FIN"], "totalBoletos" => $esta["BOLETERAS_TOTAL_BOL"]));
                         }
                     }
-                    array_push($arreglo, Array("id" => $actual["VUELTAS_ID"], "fechaHora" => $actual["FECHA_HORA"], "unidad" => $actual["UNIDAD"], "ruta" => $actual["RUTA"], "chofer" => $actual["CHOFER"], "numero" => $actual["NUMERO"] , "comentarios" => $actual["VUELTAS_COMENTARIOS"], "boleteras" => $arr));
                 }
-                return Array("mensaje" => "ok", "data" => $arreglo);
+                return Array("mensaje" => "ok", "data" => Array("vueltas" => count($valores), "chofer" => $valores[0]["CHOFER"], "unidad" => $valores[0]["UNIDAD"], "ruta" => $valores[0]["RUTA"], "boleterasTotal" => count($arr), "boleteras" => $arr));
             }
             return Array("mensaje" => "Sin datos");
         }
@@ -346,7 +344,11 @@
                 $cerrar = $GLOBALS["DB"]->ejecutar_consulta("UPDATE datos_vueltas SET VUELTAS_FECHA_HORA_FIN = '{$fechaCierre}', VUELTAS_ESTADO='CERRADA', VUELTAS_BRUTO = {$data->bruto}, VUELTAS_GASTOS = {$data->gastosTotal}, VUELTAS_MONTO={$data->monto}, VUELTAS_ENTREGADO = {$data->entregado}, VUELTAS_COMISION = {$comision}, VUELTAS_COMENTARIOS = '{$data->comentarios}', VUELTAS_CERRADA={$validar['id']} WHERE VUELTAS_ID={$data->vuelta}");
                 if($cerrar)
                 {
-                    return Array("mensaje" => "ok");
+                    $ingresar = $GLOBALS["DB"]->ejecutar_consulta("INSERT INTO balance_entradas (ENTRADAS_DESCRIPCION, ENTRADAS_MONTO, ENTRADAS_CAJA, ENTRADAS_USUARIO, ENTRADAS_AUTORIZO) VALUES ('RECAUDACION DE VUELTA',{$data->entregado}, 1, (SELECT VUELTAS_CHOFER FROM datos_vueltas WHERE VUELTAS_ID = {$data->vuelta}), {$validar['id']})");
+                    if($ingresar)
+                    {
+                        return Array("mensaje" => "ok");
+                    }
                 }
                 
             }
@@ -411,7 +413,7 @@
                 $arra = Array();
                 foreach($consulta as $actual)
                 {
-                    array_push($arra, Array("inicio" => $actual["INICIO"], "fin" => $actual["FIN"], "abrio" => $actual["CAJERA_ABRIO"], "ruta" => $actual["RUTA"], "vuelta" => $actual["VUELTAS_NUMERO"], "bruto" => $actual["VUELTAS_BRUTO"], "gastos" => $actual["VUELTAS_GASTOS"],  "monto" => $actual["VUELTAS_MONTO"], "entregado" => $actual["VUELTAS_ENTREGADO"], "diferencia" => $actual["DIFERENCIA"], "comision" => $actual["VUELTAS_COMISION"], "comentarios" => $actual["VUELTAS_COMENTARIOS"], "cerro" => $actual["CAJERA_CERRO"], "boletos" => $actual["BOLETOS"]));
+                    array_push($arra, Array("inicio" => $actual["INICIO"], "fin" => $actual["FIN"], "abrio" => $actual["CAJERA_ABRIO"], "ruta" => $actual["RUTA"], "vuelta" => $actual["VUELTAS_NUMERO"], "bruto" => '$'.$actual["VUELTAS_BRUTO"], "gastos" => '$'.$actual["VUELTAS_GASTOS"],  "monto" => '$'.$actual["VUELTAS_MONTO"], "entregado" => '$'.$actual["VUELTAS_ENTREGADO"], "diferencia" => '$'.$actual["DIFERENCIA"], "comision" => '$'.$actual["VUELTAS_COMISION"], "comentarios" => $actual["VUELTAS_COMENTARIOS"], "cerro" => $actual["CAJERA_CERRO"], "boletos" => $actual["BOLETOS"]));
                 }
                 $turno = $GLOBALS["DB"]->ejecutar_consulta("SELECT (SELECT UNIDADES_NOMBRE FROM datos_unidades WHERE UNIDADES_ID = TURNOS_UNIDAD) AS UNIDAD, (SELECT USUARIOS_NOMBRE FROM usuario_usuarios WHERE USUARIOS_ID = TURNOS_CHOFER) AS CHOFER, TURNOS_VUELTAS, TURNOS_INICIO FROM datos_turnos WHERE TURNOS_ID={$id}");
                 if($turno)
@@ -450,7 +452,7 @@
                     $confirmar= 0;
                     foreach($data->gastos as $actual)
                     {
-                        $gas = $GLOBALS["DB"]->ejecutar_consulta("INSERT INTO datos_gastos_turno (GASTOS_TUR_TURNO, GASTOS_TUR_MONTO, GASTOS_TUR_DESCRIPCION) VALUES ({$data->id}, {$actual->monto}, '{$actual->descripcion}')");
+                        $gas = $GLOBALS["DB"]->ejecutar_consulta("INSERT INTO datos_gastos_turno (GASTOS_TUR_TURNO, GASTOS_TUR_CANTIDAD, GASTOS_TUR_MONTO, GASTOS_TUR_DESCRIPCION) VALUES ({$data->id}, {$actual->cantidad}, {$actual->monto}, '{$actual->descripcion}')");
                         if($gas)
                         {
                             $confirmar++;
@@ -458,13 +460,17 @@
                     }
                     if($confirmar==count($data->gastos))
                     {
-                        $lis = $GLOBALS["DB"]->ejecutar_consulta("INSERT INTO datos_liquidaciones (LIQUIDACIONES_TURNO, LIQUIDACIONES_MONTO, LIQUIDACIONES_GASTOS, LIQUIDACIONES_UTILIDADES, LIQUIDACIONES_RECAUDADO, LIQUIDACIONES_UNIDAD, LIQUIDACIONES_CHOFER, LIQUIDACIONES_ESTADO) VALUES ({$data->id}, {$data->venta}, {$data->totalGastos}, {$utilidad}, {$data->recaudado}, (SELECT TURNOS_UNIDAD FROM datos_turnos WHERE TURNOS_ID = {$data->id}), (SELECT TURNOS_CHOFER FROM datos_turnos WHERE TURNOS_ID = {$data->id}), 'RECIBIDO')");
+                        $lis = $GLOBALS["DB"]->ejecutar_consulta("INSERT INTO datos_liquidaciones (LIQUIDACIONES_PERMISIONARIO, LIQUIDACIONES_TURNO, LIQUIDACIONES_MONTO, LIQUIDACIONES_GASTOS, LIQUIDACIONES_UTILIDADES, LIQUIDACIONES_RECAUDADO, LIQUIDACIONES_UNIDAD, LIQUIDACIONES_CHOFER, LIQUIDACIONES_ESTADO) VALUES ((SELECT USUARIOS_ID FROM usuario_usuarios INNER JOIN datos_unidades ON UNIDADES_PERMISIONARIO = USUARIOS_ID WHERE UNIDADES_ID = (SELECT TURNOS_UNIDAD FROM datos_turnos WHERE TURNOS_ID = {$data->id})) , {$data->id}, {$data->venta}, {$data->totalGastos}, {$utilidad}, {$data->recaudado}, (SELECT TURNOS_UNIDAD FROM datos_turnos WHERE TURNOS_ID = {$data->id}), (SELECT TURNOS_CHOFER FROM datos_turnos WHERE TURNOS_ID = {$data->id}), 'RECIBIDO')");
                         if($lis)
                         {
                             $com = $GLOBALS["DB"]->ejecutar_consulta("INSERT INTO usuario_comisiones (COMISIONES_CHOFER, COMISIONES_TURNO, COMISIONES_MONTO) VALUES ((SELECT TURNOS_CHOFER FROM datos_turnos WHERE TURNOS_ID={$data->id}),{$data->id},{$data->comision})");
                             if($com)
                             {
-                                return Array("mensaje" => "ok");
+                                $ingresar = $GLOBALS["DB"]->ejecutar_consulta("INSERT INTO balance_salidas (SALIDAS_DESCRIPCION, SALIDAS_MONTO, SALIDAS_CAJA, SALIDAS_USUARIO, SALIDAS_AUTORIZO) VALUES ('PAGO DE COMISION A CHOFER', {$data->comision}, 1, (SELECT TURNOS_CHOFER FROM datos_turnos WHERE TURNOS_ID = {$data->id}), {$validacion['id']})");
+                                if($ingresar)
+                                {
+                                    return Array("mensaje" => "ok");
+                                }
                             }
                             return Array("mensaje" => "Error interno 5");
                         }
@@ -477,6 +483,209 @@
             return Array("mensaje" => "Error interno");
         }
         return Array("mensaje" => "error");
+    }
+
+    /**
+     * Funcion para obtener todos los movimientos de caja
+     * 
+     * @param String $token El token de acceso
+     * @return Array Un array con los datos solicitados
+     * 
+     * @author Juanjo Romero
+     */
+    function get_movimientos($token)
+    {
+        if(!validar_parametros_get([$token]))
+        {
+            return Array("mensaje" => "error");
+        }
+        $validacion = validar_token($token);
+        if($validacion)
+        {
+            $consulta = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT MOVIMIENTOS_TIMESTAMP AS FECHA_HORA, MOVIMIENTOS_MONTO AS MONTO, MOVIMIENTOS_TIPO AS TIPO, (CASE WHEN MOVIMIENTOS_TIPO = 'ENTRADA' THEN (SELECT ENTRADAS_DESCRIPCION FROM balance_entradas WHERE ENTRADAS_ID = MOVIMIENTOS_RELACION) WHEN MOVIMIENTOS_TIPO = 'SALIDA' THEN (SELECT SALIDAS_DESCRIPCION FROM balance_salidas WHERE SALIDAS_ID = MOVIMIENTOS_RELACION) WHEN MOVIMIENTOS_TIPO = 'AJUSTE' THEN (SELECT AJUSTES_DESCRIPCION FROM balance_ajustes WHERE AJUSTES_ID = MOVIMIENTOS_RELACION) END) AS DESCRIPCION FROM balance_movimientos");
+            if($consulta)
+            {
+                $salidas = Array();
+                $entradas = Array();
+                $ajustes = Array();
+                foreach($consulta as $actual)
+                {
+                    if($actual["TIPO"]=="ENTRADA")
+                    {
+                        array_push($entradas, Array("fechaHora" => $actual["FECHA_HORA"], "monto" => $actual["MONTO"], "tipo" => $actual["TIPO"], "descripcion" => $actual["DESCRIPCION"], "estado" => $actual["ESTADO"]));
+                    }
+                    else if($actual["TIPO"]=="SALIDA")
+                    {
+                        array_push($salidas, Array("fechaHora" => $actual["FECHA_HORA"], "monto" => $actual["MONTO"], "tipo" => $actual["TIPO"], "descripcion" => $actual["DESCRIPCION"], "estado" => $actual["ESTADO"]));
+                    }
+                    else
+                    {
+                        array_push($ajustes, Array("fechaHora" => $actual["FECHA_HORA"], "monto" => $actual["MONTO"], "tipo" => $actual["TIPO"], "descripcion" => $actual["DESCRIPCION"], "estado" => $actual["ESTADO"]));
+                    }
+                }
+                return Array("mensaje" => "ok", "data" => Array("entradas" => $entradas, "salidas" => $salidas, "ajustes" => $ajustes));
+            }
+        }
+        return Array("mensaje" => "error");
+    }
+
+    /**
+     * Funcion para obtener todas las liquidaciones listas para ser entregadas
+     * 
+     * @param String $token El token de acceso del usuario
+     * @return Array Arreglo con los datos solicitados
+     * 
+     * @author Juanjo Romero
+     */
+    function get_liquidaciones($token)
+    {
+        if(!validar_parametros_get([$token]))
+        {
+            return Array("mensaje" => "error");
+        }
+        
+        $validar = validar_token($token);
+        if($validar)
+        {
+            $consulta = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT USUARIOS_ID, USUARIOS_NOMBRE, (SELECT SUM(LIQUIDACIONES_MONTO) FROM datos_liquidaciones WHERE LIQUIDACIONES_PERMISIONARIO = USUARIOS_ID AND LIQUIDACIONES_ESTADO = 'RECIBIDO') AS VENTA, (SELECT SUM(LIQUIDACIONES_GASTOS) FROM datos_liquidaciones WHERE LIQUIDACIONES_PERMISIONARIO = USUARIOS_ID AND LIQUIDACIONES_ESTADO = 'RECIBIDO') AS GASTOS, (SELECT SUM(LIQUIDACIONES_UTILIDADES) FROM datos_liquidaciones WHERE LIQUIDACIONES_PERMISIONARIO = USUARIOS_ID AND LIQUIDACIONES_ESTADO = 'RECIBIDO') AS UTILIDAD, (SELECT SUM(LIQUIDACIONES_RECAUDADO) FROM datos_liquidaciones WHERE LIQUIDACIONES_PERMISIONARIO = USUARIOS_ID AND LIQUIDACIONES_ESTADO = 'RECIBIDO') AS RECAUDADO, (SELECT COUNT(LIQUIDACIONES_ID) FROM datos_liquidaciones WHERE LIQUIDACIONES_PERMISIONARIO = USUARIOS_ID AND LIQUIDACIONES_ESTADO = 'RECIBIDO') AS LIQUIDACIONES FROM usuario_usuarios WHERE USUARIOS_TIPO = 4 ORDER BY USUARIOS_NOMBRE");
+            if($consulta)
+            {
+                $arr = Array();
+                foreach($consulta as $actual)
+                {
+                    if($actual["LIQUIDACIONES"]==0)
+                    {
+                        array_push($arr, Array("id" => $actual["USUARIOS_ID"], "nombre" => $actual["USUARIOS_NOMBRE"], "venta" => 0, "gastos" => 0, "utilidad" => 0, "recaudado" => 0, "liquidaciones" => 0, "activo" => 0));
+                    }
+                    else
+                    {
+                        array_push($arr, Array("id" => $actual["USUARIOS_ID"], "nombre" => $actual["USUARIOS_NOMBRE"], "venta" => $actual["VENTA"], "gastos" => $actual["GASTOS"], "utilidad" => $actual["GASTOS"], "recaudado" => $actual["RECAUDADO"], "liquidaciones" => $actual["LIQUIDACIONES"], "activo" => 1));
+                    }
+                    
+                }
+                return Array("mensaje" => "ok", "data" => $arr);
+            }
+        }
+        return Array("mensaje" => "error");
+    }
+
+    /**
+     * Funcion para entregar el dinero a un permisionario
+     * @param Object $data Objeto que contiene la informacion necesaria
+     * @return Array Arreglo con la informacion necesitada
+     * 
+     * @author Juanjo Romero
+     */
+    function pagar_permisionario($data)
+    {
+        if(!validar_parametros_option($data, ['token', 'id', 'monto'], 3))
+        {
+            return Array("mensaje" => "error");
+        }
+        $validar = validar_token($data->token);
+        if($validar)
+        {
+            $consulta = $GLOBALS["DB"]->ejecutar_consulta("UPDATE datos_liquidaciones SET LIQUIDACIONES_ESTADO = 'COBRADA', LIQUIDACIONES_ENTREGO = {$validar['id']} WHERE LIQUIDACIONES_ESTADO = 'RECIBIDO' AND LIQUIDACIONES_PERMISIONARIO = {$data->id}");
+            if($consulta)
+            {
+                $inser = $GLOBALS["DB"]->ejecutar_consulta("INSERT INTO balance_salidas (SALIDAS_DESCRIPCION, SALIDAS_MONTO, SALIDAS_CAJA, SALIDAS_USUARIO, SALIDAS_AUTORIZO) VALUES ('PAGO A PERMISIONARIO',{$data->monto}, 1, {$data->id}, {$validar['id']})");
+                if($inser)
+                {
+                    return Array("mensaje" => "ok");
+                }
+            }
+        }
+        return Array("mensaje" => "error");
+    }
+
+    /**
+     * Funcion para obtener el total del dinero reacudado
+     * @param String $token El token de Acceso
+     * @return Array Un arreglo con todos los datos solicitados
+     * 
+     * @author Juanjo Romero
+     */
+    function get_recaudado($token)
+    {
+        if(!validar_parametros_get([$token]))
+        {
+            return Array("mensaje" => "error");
+        }
+        
+        $validar = validar_token($token);
+        if($validar)
+        {
+            $saldo = $GLOBALS["DB"]->ejecutar_consulta("SELECT SALDOS_FECHA_HORA AS FECHA, SALDOS_MONTO FROM balance_saldos WHERE SALDOS_ID = 1");
+            if($saldo)
+            {
+                return Array("mensaje" => "ok", "data" => Array("fechaHora" => $saldo['FECHA'], "monto" => '$'. $saldo['SALDOS_MONTO']));
+            }
+        }
+        return Array("mensaje" => "error");
+    }
+
+    /**
+     * Funcion para recibir un pago ya sea administrativo o de monitoreo
+     * 
+     * @param Object $datos El objeto que contiene la información del pago
+     * @return Array Un arreglo con la informacion solicitada
+     * 
+     * @author Juanjo Romero
+     */
+    function realizar_pago($datos)
+    {
+        if(!validar_parametros_option($datos, ['token', 'unidadCodigo', 'monto', 'concepto'], 4))
+        {
+            return Array("mensaje" => "error");
+        }
+
+        $validacion = validar_token($datos->token);
+        if($validacion)
+        {
+            $unidad = $GLOBALS["DB"]->ejecutar_consulta("SELECT UNIDADES_NOMBRE, UNIDADES_PERMISIONARIO FROM datos_unidades WHERE UNIDADES_CODIGO = '{$datos->unidadCodigo}'");
+            $descripcion = $datos->concepto . ' ' . $unidad["UNIDADES_NOMBRE"];
+            $consulta = $GLOBALS["DB"]->ejecutar_consulta("INSERT INTO balance_pagos SET PAGOS_DESCRIPCION = '{$descripcion}', PAGOS_MONTO = {$datos->monto}, PAGOS_CAJA = 1, PAGOS_USUARIO = {$unidad['UNIDADES_PERMISIONARIO']},PAGOS_AUTORIZO = {$validacion['id']}");
+            if($consulta)
+            {
+                return Array("mensaje" => "ok");
+            }
+        }
+        return Array("mensaje" => "error interno");
+    }
+
+    /**
+     * Funcion para retirar dinero de la caja
+     * 
+     * @param Object $datos Un objeto con todos los datos necesarios
+     * @return Array Un array con los valores necesitados
+     * 
+     * @author Juanjo Romero
+     */
+    function realizar_retiro($datos)
+    {
+        if(!validar_parametros_option($datos, ['token', 'user', 'password', 'monto'], 4))
+        {
+            return Array("mensaje" => "error");
+        }
+
+        $validacion = validar_token($datos->token);
+        if($validacion)
+        {
+            $usuario = $GLOBALS["DB"]->ejecutar_consulta("SELECT USUARIOS_ID, USUARIOS_PASSWORD, USUARIOS_TIPO FROM usuario_usuarios WHERE USUARIOS_NICKNAME='{$datos->user}'");
+            if($usuario["USUARIOS_PASSWORD"]==$datos->password && $usuario["USUARIOS_TIPO"] < 2)
+            {
+                $insert = $GLOBALS["DB"]->ejecutar_consulta("INSERT INTO balance_salidas (SALIDAS_DESCRIPCION, SALIDAS_MONTO, SALIDAS_CAJA, SALIDAS_USUARIO, SALIDAS_AUTORIZO) VALUES ('RETIRO ADMINISTRATIVO', {$datos->monto}, 1, {$usuario['USUARIOS_ID']}, {$validacion['id']})");
+                if($insert)
+                {
+                    $ingresar = $GLOBALS["DB"]->ejecutar_consulta("INSERT INTO balance_entradas (ENTRADAS_DESCRIPCION, ENTRADAS_MONTO, ENTRADAS_CAJA, ENTRADAS_USUARIO, ENTRADAS_AUTORIZO) VALUES ('RETIRO ADMINISTRATIVO', {$datos->monto}, 2, {$validacion['id']}, {$usuario['USUARIOS_ID']})");
+                    if($ingresar)
+                    {
+                        return Array("mensaje" => "ok");
+                    }
+                }
+            }
+        }
+        return Array("mensaje" => "error"); 
     }
 
     function obtener_sumas($token)

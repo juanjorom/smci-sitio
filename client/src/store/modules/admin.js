@@ -2,7 +2,8 @@ import axios from 'axios'
 
 const state = {
     usuarios: [],
-    roles: []
+    roles: [],
+    modulos: []
 }
 
 const getters =  {
@@ -14,6 +15,9 @@ const getters =  {
     },
     getUnidades: state =>{
         return state.unidades
+    },
+    getModulos: state =>{
+        return state.modulos
     }
 }
 
@@ -23,6 +27,9 @@ const mutations = {
     },
     setRoles(state, roles){
         state.roles = roles
+    },
+    setModulos(state, modulos){
+        state.modulos =modulos
     }
 }
 
@@ -43,7 +50,6 @@ const actions = {
     async addModulo({rootState, dispatch}, modulo){
         try{
             modulo.token = rootState.logdata.key
-            console.log(modulo);
             var peticion = await axios.post(rootState.logdata.host + "/addModulo", modulo)
             if(peticion.data.mensaje == "ok"){
                 dispatch('getModulosServer')
@@ -97,7 +103,19 @@ const actions = {
         }catch{
             return false
         }
-    }
+    },
+    async getModulosServer({rootState, commit}){
+        try{
+            var peticion = await axios.get(rootState.logdata.host + "/getModulos?token="+rootState.logdata.key)
+            if(peticion.data.mensaje == "ok"){
+                commit('setModulos', peticion.data.data)
+            }else{
+                commit('setModulos', [])
+            }
+        } catch {
+            commit('setModulos', [])
+        }
+    },
 }
 
 export default {

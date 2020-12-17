@@ -7,7 +7,7 @@
           <v-card-text>
               <v-menu max-width="150" offset-y  max-height="300">
                   <template v-slot:activator="{on, attrs}">
-                      <v-text-field v-model="unidad" label="Unidad" v-bind="attrs" v-on="on" @blur="opacar('unidades', 'unidad')"></v-text-field>
+                      <v-text-field v-model="unidad" label="Unidad" v-bind="attrs" v-on="on" @focus="temporal=''" @keyup="temporal=unidad" @blur="opacar('unidades', 'unidad')"></v-text-field>
                   </template>
                   <v-list v-model="unidadCodigo" >
                       <v-list-item v-for="(item, index) in unidades" :key="index" @click="unidad=item.nombre; unidadCodigo=item.codigo" >
@@ -17,7 +17,7 @@
               </v-menu>
               <v-menu  max-width="300" offset-y max-height="300">
                   <template v-slot:activator="{on, attrs}">
-                      <v-text-field v-model="chofer" label="Chofer" v-bind="attrs" v-on="on" @blur="opacar('choferes', 'chofer')"></v-text-field>
+                      <v-text-field v-model="chofer" label="Chofer" v-bind="attrs" v-on="on"  @focus="temporal=''" @keyup="temporal=chofer" @blur="opacar('choferes', 'chofer')"></v-text-field>
                   </template>
                   <v-list v-model="choferCodigo">
                       <v-list-item v-for="(item, index) in choferes" :key="index" @click="chofer=item.nombre; choferCodigo=item.nickname" >
@@ -52,7 +52,7 @@
                   <v-col cols="10">
                   <v-menu max-width="300" offset-y>
                   <template v-slot:activator="{on, attrs}">
-                      <v-text-field v-model="boletera" label="Boletera" placeholder="Codigo" v-bind="attrs" v-on="on" @blur="opacar('boleteras', 'boletera')"></v-text-field>
+                      <v-text-field v-model="boletera" label="Boletera" placeholder="Codigo" v-bind="attrs" v-on="on" @focus="temporal=''" @keyup="temporal=boletera"  @blur="opacar('boleteras', 'boletera')"></v-text-field>
                   </template>
                   <v-list>
                       <v-list-item v-for="(item, index) in boleteras" :key="index" @click="boletera=item.codigo" >
@@ -129,7 +129,8 @@ export default {
         password: "",
         loader: false,
         mensaje: "",
-        succes: false
+        succes: false,
+        temporal: ""
     }),
     beforeMount(){
         if(this.logeado==null && this.sesion==false){
@@ -170,6 +171,7 @@ export default {
             logeado: 'logdata/getKey',
             sesion: 'logdata/getSucess'
         }),
+        
         activar(){
             if(this.unidad!="" && this.chofer!="" && this.ruta!="" && this.hora!="" && this.boleterasAsignadas.length>0){
                 return false
@@ -177,20 +179,20 @@ export default {
             return true
         },
         unidades(){
-            if(this.unidad!=""){
-                return this.someUnidades(this.unidad)
+            if(this.temporal!=""){
+                return this.someUnidades(this.temporal)
             }
             return this.allUnidades
         },
         choferes(){
-            if(this.chofer!=""){
-                return this.someChoferes(this.chofer)
+            if(this.temporal!=""){
+                return this.someChoferes(this.temporal)
             }
             return this.allChoferes
         },
         boleteras(){
-            if(this.boletera!=""){
-                var bol = this.someBoleteras(this.boletera.toUpperCase())
+            if(this.temporal!=""){
+                var bol = this.someBoleteras(this.temporal.toUpperCase())
                 return bol.filter(el => !(this.boleterasAsignadas.includes(el.codigo)))
             }
             return this.allBoleteras.filter(el => !(this.boleterasAsignadas.includes(el.codigo)))

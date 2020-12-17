@@ -18,7 +18,7 @@
                             </v-list-item-subtitle>
                       </v-list-item-content>
                       <v-list-item-action>
-                          <v-btn color="success" @click="modal=true; id=tur.id"><v-icon>mdi-cash</v-icon></v-btn>
+                          <v-btn color="success" :to="{name: 'pagarReporte', params: {id: tur.id}}"><v-icon>mdi-cash</v-icon></v-btn>
                       </v-list-item-action>
                   </v-list-item>
                 </v-list>
@@ -28,17 +28,6 @@
           <v-btn color="error" to="cajaHome">Cancelar</v-btn>
         </v-card-actions>
       </v-card>
-      <v-dialog v-model="modal" max-width="400">
-            <v-card>
-                <v-card-title>Ingrese su contraseña</v-card-title>
-                <v-card-text>
-                    <v-text-field v-model="password" label="Contraseña" placeholder="Contraseña" type="password" @keydown="isEnter($event)"></v-text-field>
-                </v-card-text>
-                <v-card-actions>
-                    <v-btn @click="validarPassword">Ok</v-btn>
-                </v-card-actions>
-            </v-card>
-        </v-dialog>
   </v-container>
 </template>
 
@@ -56,8 +45,6 @@ export default {
   data: () => ({
     modal: false,
     buscar: "",
-    password: "",
-    id: null
   }),
   computed: {
     ...mapGetters({
@@ -78,18 +65,6 @@ export default {
       traerTurnos: "cajeras/getAllTurnosServer",
       validar: "logdata/validarPassword"
     }),
-    isEnter(event){
-      if(event.key=="Enter"){
-        this.validarPassword()
-      }
-    },
-    async validarPassword(){
-      if(this.password!=""){
-        if(await this.validar(this.password)){
-          this.$router.push({name: "pagarReporte", params: {id: this.id}})
-        }
-      }
-    }
   }
 }
 </script>

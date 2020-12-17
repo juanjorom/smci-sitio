@@ -1,11 +1,11 @@
 <template>
   <v-container>
-        <v-card max-height="700">
+        <v-card max-height="500">
           <v-card-title>Vueltas abiertas</v-card-title>
           <v-card-text>
               <v-text-field v-model="buscar" label="Buscar Unidad" placeholder="Numero">
               </v-text-field>
-              <v-card height="450" max-height="450" class="overflow-y-auto" v-if="vueltas.length>0">
+              <v-card height="250" max-height="250" class="overflow-y-auto" v-if="vueltas.length>0">
                 <v-list >
                   <v-list-item v-for="(lap, i) in vueltas"  :key="i">
                       <v-list-item-icon>
@@ -18,12 +18,12 @@
                             </v-list-item-subtitle>
                       </v-list-item-content>
                       <v-list-item-action>
-                          <v-btn color="success" @click="modal=true; id=lap.id"><v-icon>mdi-cash</v-icon></v-btn>
+                          <v-btn color="success" :to="{name: 'recibirVuelta',params: {id:lap.id}}" ><v-icon>mdi-cash</v-icon></v-btn>
                       </v-list-item-action>
                   </v-list-item>
                 </v-list>
               </v-card>
-              <v-card  height="450" max-height="450" v-else>
+              <v-card  height="250" max-height="250" v-else>
                   <v-card-subtitle>No tienes vueltas abiertas</v-card-subtitle>
               </v-card>
           </v-card-text>
@@ -32,7 +32,7 @@
             <v-btn @click="liquidar">Liquidar Chofer</v-btn>
           </v-card-actions>
         </v-card>
-        <v-dialog v-model="modal" max-width="400">
+        <!--<v-dialog v-model="modal" max-width="400">
             <v-card>
                 <v-card-title>Ingrese su contraseña</v-card-title>
                 <v-card-text>
@@ -42,7 +42,7 @@
                     <v-btn @click="validarPassword()">Ok</v-btn>
                 </v-card-actions>
             </v-card>
-        </v-dialog>
+        </v-dialog>-->
     </v-container>
 </template>
 
@@ -58,9 +58,7 @@ export default {
     },
     data: () => ({
         buscar: "",
-        modal: false,
-        password: "",
-        id: null,
+        modal: false
     }),
     computed: {
         ...mapGetters({

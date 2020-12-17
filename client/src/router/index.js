@@ -18,6 +18,10 @@ import PagarReporte from '@/views/pagarReporte'
 import Usuarios from '@/views/Usuarios'
 import Unidades from '@/views/Unidades'
 import Modulos from '@/views/Modulos'
+import Movimientos from '@/views/Movimientos'
+import liquidarPermisionario from '@/views/liquidarPermisionario'
+import MovimientosHome from '@/views/MovimientosHome'
+import ingresarPago from '@/views/ingresarPago'
 
 Vue.use(Router)
 
@@ -142,6 +146,33 @@ const routes= [
         path: '/modulos',
         name: 'modulos',
         component: Modulos
+    },
+    {
+        path: '/movimientos',
+        name: 'movimientos',
+        component: Movimientos,
+        children: 
+        [
+            {
+                path: 'movimientosHome',
+                name: 'movimientosHome',
+                component: MovimientosHome
+            },
+            {
+                path: 'liquidarPermisionario',
+                name: 'liquidarPermisionario',
+                component: liquidarPermisionario
+            },
+            {
+                path: 'ingresarPago',
+                name: 'ingresarPago',
+                component: ingresarPago
+            },
+            {
+                path: '/',
+                redirect: 'movimientosHome',
+            }
+        ]
     },
     {
         path: '*',

@@ -361,7 +361,7 @@ export default {
                 this.ventaTotal.forEach(el => {
                     var valor = this.boleterasCobradas.find(elem => elem.codigo==el.codigo)
                     if(valor!=undefined){
-                        nuevas.push({inicio: (parseInt(valor.boletoFinal,10)+1).toString(10), termina: el.boletoFinal, permisionario: el.codigo.substr(0,3)})
+                        nuevas.push({inicio: (parseInt(valor.boletoFinal,10)+1).toString(10), termina: el.boletoFinal, permisionario: el.permisionario})
                     }
                 })
                 for( var i=0; i<nuevas.length; i++){

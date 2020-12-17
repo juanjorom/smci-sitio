@@ -58,6 +58,12 @@
                 case "addUnidad":
                     $RESPUESTA = add_unidad($datos);
                 break;
+                case "ingresarPago":
+                    $RESPUESTA = realizar_pago($datos);
+                break;
+                case "realizarRetiro":
+                    $RESPUESTA = realizar_retiro($datos);
+                break;
                 default:
                     $RESPUESTA= Array("mensaje" => "Recurso no existe");
                 break;
@@ -112,6 +118,15 @@
                 case "getRoles":
                     $RESPUESTA = get_roles($_GET["token"]);
                 break;
+                case "getMovimientos":
+                    $RESPUESTA = get_movimientos($_GET["token"]);
+                break;
+                case "getLiquidaciones":
+                    $RESPUESTA = get_liquidaciones($_GET["token"]); 
+                break;
+                case "getRecaudacion":
+                    $RESPUESTA = get_recaudado($_GET["token"]);
+                break;
                 default;
                     $RESPUESTA= Array("mensaje" => "Recurso no existe");
                 break;
@@ -138,6 +153,9 @@
                 break;
                 case "pagarTurno":
                     $RESPUESTA = pagar_turno($datos);
+                break;
+                case "pagarPermisionario":
+                    $RESPUESTA = pagar_permisionario($datos);
                 break;
                 default:
                     $RESPUESTA= Array("mensaje" => "Recurso no existe");

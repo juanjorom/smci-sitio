@@ -4,7 +4,14 @@
             <v-card tile>
                 <v-card-title>Boleteras Agregadas</v-card-title>
                 <v-card-text  v-if="allBoleteras.length>0"   >
-                    <v-select :items="filtros" v-model="filtro"></v-select>
+                    <v-row>
+                        <v-col cols="6">
+                            <v-select :items="filtros" v-model="filtro" label="Filtrar por estado"></v-select>
+                        </v-col>
+                        <v-col cols="6">
+                            <v-select :items="permisionarios" v-model="permisionario" label="Filtrar por permisionario"></v-select>
+                        </v-col>
+                    </v-row>
                     <v-card  max-height="650" class="overflow-y-auto">
                         <v-col>
                             <v-list v-model="selected">
@@ -13,9 +20,8 @@
                                         <v-list-item-title>
                                             Boletera: {{bol.codigo}}
                                         </v-list-item-title>
-                                        <v-list-item-subtitle>
-                                            Inicia: {{bol.boletoInicial}} Permisionario: {{bol.permisionario}} Estado: {{bol.estado}}
-                                        </v-list-item-subtitle>
+                                        <p class="font-weight-black">Inicia: {{bol.boletoInicial}}</p> 
+                                        <v-list-item-subtitle>Permisionario: {{bol.permisionario}} Estado: {{bol.estado}}</v-list-item-subtitle>
                                     </v-list-item-content>
                                     <v-list-item-action>
                                             <v-btn fab :disabled="bol.estado!='NO ASIGNADA'" @click="codigo=bol.codigo; confirmar=true">
@@ -80,7 +86,7 @@ export default {
         password: "",
         boletera: {},
         selected: 0,
-        permisionarioSelected: "",
+        permisionario: "",
         modal: false,
         filtros: ["COBRADA", "NO ASIGNADA", "ASIGNADA", "TODAS"],
         filtro: ""
@@ -92,10 +98,19 @@ export default {
             sesion: 'logdata/getSucess'
         }),
         boleterasMostrar(){
-            if(this.filtro!="" && this.filtro!="TODAS"){
+            if((this.filtro!="" && this.filtro!="TODAS") && (this.permisionario!= "" && this.permisionario!="TODOS")){
+                return this.allBoleteras.filter(el => el.estado==this.filtro && el.permisionario == this.permisionario)
+            }else if(this.permisionario!= "" && this.permisionario!="TODOS"){
+                return this.allBoleteras.filter(el => el.permisionario==this.permisionario)
+            }else if(this.filtro!="" && this.filtro!="TODAS"){
                 return this.allBoleteras.filter(el => el.estado==this.filtro)
             }
             return this.allBoleteras
+        },
+        permisionarios(){
+            var filtros = this.allBoleteras.map(el => el.permisionario)
+            filtros.push("TODOS")
+            return filtros
         }
     },
 
@@ -121,14 +136,14 @@ export default {
             }
         },
         cancel(){
-            this.confirmar=false
+            this.confirmar = false
             this.codigo=""
         },
         async validarPassword(){
-            if(this.password!=""){
+            if(this.password != ""){
                 if(await this.validar(this.password)){
-                    this.password=""
-                    this.confirmar=false
+                    this.password = ""
+                    this.confirmar = false
                     this.delBoletera(this.codigo)
                 }
                 else{

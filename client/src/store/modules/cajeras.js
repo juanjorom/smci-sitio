@@ -9,7 +9,10 @@ const state = {
     openLaps: [],
     turnos: [],
     turnoPagar: null,
-    boleterasAsignar: []
+    boleterasAsignar: [],
+    movimientos: [],
+    liquidaciones: [],
+    recaudacion: {fechaHora: null, monto: null}
 }
 
 const getters = {
@@ -84,6 +87,15 @@ const getters = {
     },
     getTurnoPagar: state => {
         return state.turnoPagar
+    },
+    getMovimientos: state => {
+        return state.movimientos
+    },
+    getLiquidaciones: state => {
+        return state.liquidaciones
+    },
+    getRecaudado: state => {
+        return state.recaudacion
     }
 }
 
@@ -117,6 +129,15 @@ const mutations = {
     },
     setBoleterasAsignar(state, boleteras){
         state.boleterasAsignar = boleteras
+    },
+    setMovimientos(state, movimientos){
+        state.movimientos = movimientos
+    },
+    setLiquidaciones(state, liquidaciones){
+        state.liquidaciones = liquidaciones
+    },
+    setRecaudacion(state, recaudado){
+        state.recaudacion = recaudado
     }
 }
 
@@ -274,7 +295,6 @@ const actions = {
         try{
             turno.token = rootState.logdata.key
             const peticion = await axios.put(rootState.logdata.host+"/pagarTurno", turno)
-            console.log(peticion);
             if(peticion.data.mensaje=="ok"){
                 return true
             }
@@ -295,7 +315,106 @@ const actions = {
         } catch (error){
             console.log("Error en la conexion ", error)
         }
-    }
+    },
+    async getMovimientosServer({rootState, commit}){
+        try{
+            var peticion = await axios.get(rootState.logdata.host+"/getMovimientos?token="+rootState.logdata.key)
+            if(peticion.data.mensaje == "ok"){
+                commit('setMovimientos', peticion.data.data)
+            }else{
+                commit('setMovimientos', [])
+            }
+        } catch (error) {
+            commit('setMovimientos', [])
+            console.log("Error en la conexion", error);
+        }
+    },
+    async addRetiro({rootState, dispatch}, retiro){
+        try{
+            retiro.token = rootState.logdata.key
+            var peticion = await axios.post(rootState.logdata.host+"/addRetiro", retiro)
+            if(peticion.data.mensaje == "ok"){
+                dispatch('getMovimientosServer')
+                return true
+            }else{
+                return false
+            }
+        }catch (error){
+            console.log("Error de conexion", error);
+            return false
+        }
+    },
+    async getLiquidacionesServer({rootState, commit}){
+        try{
+            var peticion = await axios.get(rootState.logdata.host+"/getLiquidaciones?token="+rootState.logdata.key)
+            if(peticion.data.mensaje == "ok"){
+                commit('setLiquidaciones', peticion.data.data)
+            }else{
+                commit('setLiquidaciones', [])
+            }
+        } catch (error) {
+            commit('setLiquidaciones', [])
+            console.log("Error en la conexion", error);
+        }
+    },
+    async getRecaudadoServer({rootState, commit}){
+        try{
+            var peticion = await axios.get(rootState.logdata.host+"/getRecaudacion?token="+rootState.logdata.key)
+            if(peticion.data.mensaje == "ok"){
+                commit('setRecaudacion', peticion.data.data)
+            }else{
+                commit('setRecaudacion', {fechaHora: null, monto: null})
+            }
+        } catch (error) {
+            commit('setRecaudacion', {fechaHora: null, monto: null})
+            console.log("Error en la conexion", error);
+        }
+    },
+    async pagarPermisionario({rootState, dispatch}, liquidacion){
+        try{
+            liquidacion.token = rootState.logdata.key
+            const peticion = await axios.put(rootState.logdata.host+"/pagarPermisionario", liquidacion)
+            if(peticion.data.mensaje=="ok"){
+                dispatch('getLiquidacionesServer')
+                return true
+            }
+            return false
+        } catch (error) {
+            console.log("Error en la conexion ",error)
+            return false
+        }
+    },
+
+    async ingresarPago({rootState, dispatch}, pago){
+        try{
+            pago.token = rootState.logdata.key
+            const peticion = await axios.post(rootState.logdata.host+"/ingresarPago", pago)
+            if(peticion.data.mensaje=="ok"){
+                dispatch('getMovimientosServer')
+                dispatch('getRecaudadoServer')
+                return true
+            }
+            return false
+        } catch (error) {
+            console.log("Error en la conexion ",error)
+            return false
+        }
+    },
+    async realizarRetiro({rootState, dispatch}, retiro){
+        try{
+            retiro.token = rootState.logdata.key
+            const peticion = await axios.post(rootState.logdata.host+"/realizarRetiro", retiro)
+            if(peticion.data.mensaje=="ok"){
+                dispatch('getMovimientosServer')
+                dispatch('getRecaudadoServer')
+                return true
+            }
+            return false
+        } catch (error) {
+            console.log("Error en la conexion ",error)
+            return false
+        }
+    },
 }
 
 export default {

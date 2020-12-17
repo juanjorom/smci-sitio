@@ -3,7 +3,7 @@ import axios from 'axios'
 const state = {
     key: null,
     user: null,
-    host: "https://smci.com.mx/api/recursos",
+    host: process.env.VUE_APP_PETICIONES_URL,
     sending: false,
     sucess: false,
     hostList: [],
