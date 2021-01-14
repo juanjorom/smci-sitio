@@ -5,4 +5,5 @@
     include_once("./app/aplication.php");
     include_once("./app/unidades.php");
     include_once("./app/secciones.php");
+    include_once("./app/reportes.php");
 ?>

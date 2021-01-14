@@ -44,10 +44,7 @@
             <v-card>
                 <v-card-title>{{accion}}</v-card-title>
                 <v-card-text>
-                    <v-text-field label="Nombre" v-model="usuario.nombre"></v-text-field>
-                    <v-text-field label="Nickname" v-model="usuario.nickname"></v-text-field>
                     <v-text-field label="Contraseña" v-model="usuario.password" type="password"></v-text-field>
-                    <v-select v-model="usuario.rol" :items="roles" label="Rol" item-text="rol" item-value="rol"></v-select>
                 </v-card-text>
                 <v-card-actions>
                     <v-btn @click="agregarUsuario(accion)" color="success" >Agregar</v-btn>
@@ -117,6 +114,7 @@ export default {
         }),
         llenarDatos(usuario){
             this.usuario = usuario
+            this.modal = true
         },
         limpiar(){
             this.usuario = {
@@ -146,8 +144,8 @@ export default {
                     this.loader = false
                     this.succes = true
                 }
-            }else if(accion == "Modificar"){
-                if(this.usuario.nombre!="" && this.usuario.nickname!="" && this.usuario.password!="" && this.usuario.rol){
+            }else if(accion == "Password"){
+                if(this.usuario.nickname!="" && this.usuario.password!=""){
                     if(this.addUser(this.usuario)){
                         this.mensaje = "Usuario Añadido con éxito"
                         this.modal = false

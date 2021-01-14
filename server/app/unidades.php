@@ -15,12 +15,12 @@
         $validar = validar_token($token);
         if($validar)
         {
-            $consulta=$GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT UNIDADES_CODIGO, UNIDADES_NOMBRE,(SELECT USUARIOS_NOMBRE FROM usuario_usuarios WHERE USUARIOS_ID = UNIDADES_PERMISIONARIO) AS PERMISIONARIO FROM datos_unidades WHERE UNIDADES_ELIMINADA = 0 ORDER BY UNIDADES_NOMBRE");
+            $consulta=$GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT UNIDADES_CODIGO, UNIDADES_NOMBRE, UNIDADES_PERMISIONARIO, (SELECT USUARIOS_NOMBRE FROM usuario_usuarios WHERE USUARIOS_ID = UNIDADES_PERMISIONARIO) AS PERMISIONARIO FROM datos_unidades WHERE UNIDADES_ELIMINADA = 0 ORDER BY UNIDADES_NOMBRE");
             $arr = Array();
             if($consulta){
                 foreach($consulta as $actual)
                 {
-                    array_push($arr, Array("codigo" => $actual['UNIDADES_CODIGO'], "nombre" => $actual["UNIDADES_NOMBRE"], "permisionario" => $actual["PERMISIONARIO"]));
+                    array_push($arr, Array("codigo" => $actual['UNIDADES_CODIGO'], "nombre" => $actual["UNIDADES_NOMBRE"], "permisionario" => $actual["UNIDADES_PERMISIONARIO"],  "permisionarioText" => $actual["PERMISIONARIO"]));
                 }
                 return Array("mensaje" => "ok", "data" => $arr);
             }
@@ -77,6 +77,31 @@
         if($validar)
         {
             $consulta = $GLOBALS["DB"]->ejecutar_consulta("INSERT INTO datos_unidades (UNIDADES_ANADIDO, UNIDADES_CODIGO, UNIDADES_NOMBRE, UNIDADES_PERMISIONARIO) VALUES ({$validar['id']}, '{$datos->codigo}', '{$datos->nombre}', {$datos->permisionario})");
+            if($consulta)
+            {
+                return Array("mensaje" => "ok");
+            }
+        }
+        return Array("mensaje" => "error interno");
+    }
+
+    /**
+     * Funcion para cambiar una unidad de permisionario
+     * @param Object $datos El objeto que contiene todos los datos de la unidad
+     * @return Array Un arreglo con la informacion solicitada
+     * 
+     * @author Juanjo Romero
+     */
+    function change_unidad($datos)
+    {
+        if(!validar_parametros_option($datos, ["token","codigo","permisionario"], 3))
+        {
+            return Array("mensaje" => "error");
+        }
+        $validar = validar_token($datos->token);
+        if($validar)
+        {
+            $consulta = $GLOBALS["DB"]->ejecutar_consulta("UPDATE datos_unidades SET UNIDADES_PERMISIONARIO = {$datos->permisionario} WHERE UNIDADES_CODIGO = '{$datos->codigo}'");
             if($consulta)
             {
                 return Array("mensaje" => "ok");

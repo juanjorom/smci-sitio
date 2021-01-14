@@ -90,17 +90,33 @@ const actions = {
             return false
         }
     },
-    async addUnidad({rootState}, unidad){
+    async addUnidad({rootState, dispatch}, unidad){
         try{
             unidad.token = rootState.logdata.key
             var peticion = await axios.post(rootState.logdata.host + "/addUnidad", unidad)
             if(peticion.data.mensaje == "ok")
             {
+                dispatch('cajeras/getAllUnidadesServer', {}, {root:true})
                 return true
             }else{
                 return false
             }
         }catch{
+            return false
+        }
+    },
+    async changeUnidad({rootState, dispatch}, unidad){
+        try{
+            unidad.token = rootState.logdata.key
+            var peticion = await axios.put(rootState.logdata.host + "/changeUnidad", unidad)
+            if(peticion.data.mensaje == "ok")
+            {
+                dispatch('cajeras/getAllUnidadesServer', {}, {root:true})
+                return true
+            }else{
+                return false
+            }
+        } catch{
             return false
         }
     },
@@ -116,6 +132,19 @@ const actions = {
             commit('setModulos', [])
         }
     },
+    async changePassword({rootState}, usuario){
+        try{
+            usuario.token = rootState.logdata.key
+            var peticion = await axios.put(rootState.logdata.host + "/getModulos", usuario)
+            if(peticion.data.mensaje == "ok"){
+                return true
+            }else{
+                return false
+            }
+        } catch {
+            return false
+        }
+    }
 }
 
 export default {

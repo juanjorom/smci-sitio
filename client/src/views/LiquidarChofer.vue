@@ -12,9 +12,9 @@
                                 <v-icon>mdi-bus</v-icon>
                             </v-list-item-icon>
                       <v-list-item-content>
-                            <v-list-item-title>{{tur.unidad}} Vueltas: {{tur.vueltas}} Chofer: {{tur.chofer}}</v-list-item-title>
+                            <v-list-item-title>Chofer: {{tur.chofer}}</v-list-item-title>
                             <v-list-item-subtitle>
-                                Hora Inicio: {{tur.inicio}} Ruta: {{tur.ruta}}
+                              Comision: {{tur.comision}}  Vueltas: {{tur.vueltas}}
                             </v-list-item-subtitle>
                       </v-list-item-content>
                       <v-list-item-action>
@@ -40,6 +40,8 @@ export default {
     }
     else{
       this.traerTurnos()
+      console.log("Dis");
+      console.log(this.turnos);
     }
   },
   data: () => ({

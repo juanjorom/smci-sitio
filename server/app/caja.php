@@ -358,7 +358,7 @@
     }
 
     /**
-     * Funcion para obtener todos los turnos abiertos
+     * Funcion para choferes a los que hay que pagar
      * @param String $token El token del usuario
      * @return Array Un arreglo con los datos pedidos
      * 

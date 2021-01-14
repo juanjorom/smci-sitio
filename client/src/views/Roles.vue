@@ -1,11 +1,10 @@
 <template>
-  <v-container>
-  </v-container>
+    <router-view></router-view>
 </template>
 
 <script>
 export default {
-
+    
 }
 </script>
 

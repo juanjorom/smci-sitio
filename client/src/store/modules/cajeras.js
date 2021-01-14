@@ -26,7 +26,7 @@ const getters = {
         return state.boleterasAsignar
     },
     getBoleteraById: state => id => {
-        return state.boleteras.find(el => el.codigo==id)
+        return state.boleteras.find(el => el.codigo == id)
     },
     getBoleterasByStatus: state => estado => {
         return state.boleteras.filter(el => el.status == estado)
@@ -270,9 +270,10 @@ const actions = {
     },
     async getAllTurnosServer({rootState, commit}){
         try {
-            var peticion = await axios.get(rootState.logdata.host+"/getAllTurnos?token="+rootState.logdata.key)
+            var peticion = await axios.get(rootState.logdata.host+"/getAllTurnos?token="+rootState.logdata. key)
             if(peticion.data.mensaje=="ok"){
                 commit("setTurnos", peticion.data.data)
+                console.log(peticion);
             }else{
                 commit("setTurnos", [])
             }

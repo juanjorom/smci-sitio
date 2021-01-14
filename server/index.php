@@ -127,6 +127,9 @@
                 case "getRecaudacion":
                     $RESPUESTA = get_recaudado($_GET["token"]);
                 break;
+                case "getVueltas":
+                    $RESPUESTA = get_vueltas_closed($_GET["token"], $_GET["inicio"], $_GET["fin"]);
+                break;
                 default;
                     $RESPUESTA= Array("mensaje" => "Recurso no existe");
                 break;
@@ -156,6 +159,12 @@
                 break;
                 case "pagarPermisionario":
                     $RESPUESTA = pagar_permisionario($datos);
+                break;
+                case "changeUnidad":
+                    $RESPUESTA = change_unidad($datos);
+                break;
+                case "changePassword":
+                    $RESPUESTA = update_password_admin($datos);
                 break;
                 default:
                     $RESPUESTA= Array("mensaje" => "Recurso no existe");

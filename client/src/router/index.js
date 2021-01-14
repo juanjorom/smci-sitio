@@ -8,6 +8,7 @@ import Recorrido from '@/views/Recorrido'
 import Ubicacion from '@/views/Ubicacion'
 import Configuracion from '@/views/Configuracion'
 import Roles from '@/views/Roles'
+import RolesHome from '@/views/RolesHome'
 import Boleteras from '@/views/Boleteras'
 import Caja from '@/views/Caja'
 import AbrirVuelta from '@/views/AbrirVuelta'
@@ -22,6 +23,8 @@ import Movimientos from '@/views/Movimientos'
 import liquidarPermisionario from '@/views/liquidarPermisionario'
 import MovimientosHome from '@/views/MovimientosHome'
 import ingresarPago from '@/views/ingresarPago'
+import Password from '@/views/Password'
+import Historial from '@/views/Historial'
 
 Vue.use(Router)
 
@@ -68,7 +71,18 @@ const routes= [
     {
         path: "/roles",
         name: "roles",
-        component: Roles
+        component: Roles,
+        children: [
+            {
+                path: 'rolesHome',
+                name: 'rolesHome',
+                component: RolesHome
+            },
+            {
+                path: '/',
+                redirect: 'rolesHome'
+            }
+        ]
     },
     {
         path: "/configuracion",
@@ -148,6 +162,11 @@ const routes= [
         component: Modulos
     },
     {
+        path: '/historial',
+        name: 'historial',
+        component: Historial
+    },
+    {
         path: '/movimientos',
         name: 'movimientos',
         component: Movimientos,
@@ -173,6 +192,11 @@ const routes= [
                 redirect: 'movimientosHome',
             }
         ]
+    },
+    {
+        path: '/password',
+        name: 'password',
+        component: Password
     },
     {
         path: '*',

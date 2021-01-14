@@ -70,6 +70,56 @@
         return Array("mensaje" => "error interno");
     }
 
+    /**
+     * Funcion para mandar los datos de cada dashboard dependiendo el tipo de usuario que es
+     * 
+     */
+    function get_dashboard($token)
+    {
+        if(!validar_parametros_get([$token]))
+        {
+            return Array("mensaje" => "error de autenticacion");
+        }
+        $validar = validar_token($token);
+        if($validar)
+        {
+            $tipo = $GLOBALS["DB"]->ejecutar_consulta("SELECT USUARIOS_TIPO FROM usuario_usuarios WHERE USUARIOS_ID = {$validar['id']}");
+            if($tipo)
+            {
+                switch($tipo["USUARIOS_TIPO"])
+                {
+                    case 1:
+                    
+                    break;
+                    case 2:
+
+                    break;
+                    case 3:
+
+                    break;
+                    case 4:
+
+                    break;
+                    case 5:
+
+                    break;
+                }
+            }
+        }
+    }
+    
+    function get_datos_admin()
+    {
+        $salida = Array();
+        $usuarios = $GLOBALS["DB"]->ejecutar_consulta("SELECT COUNT(*) AS TOTAL FROM usuario_usuarios WHERE USUARIOS_TIPO > 1");
+        if($usuarios)
+        {
+            array_push($salida, Array("usuarios" => $usuarios["TOTAL"]));
+        }
+        $recaudo = $GLOBALS["DB"]->ejecutar_consulta("SELECT COUNT(*) AS TOTAL FROM usuario_usuarios WHERE USUARIOS_TIPO > 1");
+        
+    }
+
     /*
     function validar_seccion($token, $seccion)
     {

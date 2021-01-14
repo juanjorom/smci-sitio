@@ -125,4 +125,42 @@
         }
         return false;
     }
+
+    /**
+     * Funcion para comparar las contraseñas
+     * @param String $passwordUsuario La contraseña ingresada por el usuario
+     * @param String $passwordDb La contraseña guardada en la base de datos
+     * @return Bool Devuelve true si las contraseñas coinciden; en caso contrario, devuelve false
+     * 
+     * @author Juanjo Romero
+     */
+    function compare_passwords($passwordUsuario, $passwordDb)
+    {
+        if(!isset($passwordUsuario) || !isset($passwordDb)){
+            return false;
+        }
+        $compaar = base64_encode(hash_hmac("sha256", $passwordUsuario, "s1m2c3i4"));
+        $GLOBALS["LOG"]["DB"]->write("Password Actual " . $passwordUsuario);
+        $GLOBALS["LOG"]["DB"]->write("Password Generado " . $compaar);
+        $GLOBALS["LOG"]["DB"]->write("Password DB " . $passwordDb);
+        if($passwordDb == $compaar){
+            return true;
+        }
+        return false;
+    }
+    //ZDg4YzM1OGM5N2IzNDU2NjIwMmRlODM1NWI0NTE0ZTM1ZmYzYmIzZGMzNDhjYmFmMjYzYmMzZTZmODkyNDRjMw==
+    //ZDg4YzM1OGM5N2IzNDU2NjIwMmRlODM1NWI0NTE0ZTM1ZmYzYmIzZGMzNDhjYmFmMjYzYmMzZTZmODkyNDRjMw==
+    /**
+     * Funcion para encriptar la contraseña
+     * @param String $password La cadena que sera convertida
+     * @return String La cadena encriptada
+     * 
+     * @author Juanjo Romero
+     */
+    function create_password($password)
+    {
+        $encript = base64_encode(hash_hmac("sha256", $password, "s1m2c3i4"));
+        $GLOBALS["LOG"]["DB"]->write("Password Generado " . $encript);
+        return $encript;
+    }
 ?>

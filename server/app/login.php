@@ -15,11 +15,12 @@
         
         $st_mail = $datos->nickname;
         $st_password = $datos->password;
-        $ar_data = $GLOBALS["DB"]->ejecutar_consulta("SELECT USUARIOS_ID, USUARIOS_PASSWORD FROM usuario_usuarios WHERE USUARIOS_NICKNAME= '{$st_mail}' AND USUARIOS_ACTIVO=1");
+        $ar_data = $GLOBALS["DB"]->ejecutar_consulta("SELECT USUARIOS_ID, USUARIOS_PASSWORD FROM usuario_usuarios WHERE USUARIOS_NICKNAME = '{$st_mail}' AND USUARIOS_ACTIVO=1");
 
         if($ar_data)
         {
-            if($ar_data['USUARIOS_PASSWORD']==$st_password){
+            if(compare_passwords($st_password,$ar_data['USUARIOS_PASSWORD']))
+            {
                 $token = generar_token($ar_data["USUARIOS_ID"]);
                 $fecha_hora = date("Y-m-d H:i:s");
                 if($GLOBALS["DB"]->ejecutar_consulta("UPDATE usuario_usuarios SET USUARIOS_TOKEN = '{$token}', USUARIOS_ULT_CON = '{$fecha_hora}' WHERE USUARIOS_ID={$ar_data['USUARIOS_ID']}"))
@@ -81,7 +82,7 @@
             $consulta = $GLOBALS["DB"]->ejecutar_consulta("SELECT USUARIOS_PASSWORD FROM usuario_usuarios WHERE USUARIOS_ID={$validar['id']}");
             if($consulta)
             {
-                if($datos->password == $consulta["USUARIOS_PASSWORD"])
+                if(compare_passwords($datos->password, $consulta["USUARIOS_PASSWORD"]))
                 {
                     return Array("mensaje" => "ok");
                 }

@@ -6,17 +6,17 @@
                 <v-card  max-height="650" class="overflow-y-auto">
                     <v-col>
                         <v-list v-model="selected">
-                            <v-list-item v-for="(unidad, i) in unidades" :key="i">
+                            <v-list-item v-for="(uni, i) in unidades" :key="i">
                                 <v-list-item-content>
                                     <v-list-item-title>
-                                        {{unidad.nombre}}
+                                        {{uni.nombre}}
                                     </v-list-item-title>
                                     <v-list-item-subtitle>
-                                        Codigo: {{unidad.codigo}} Permisionario: {{unidad.permisionario}}
+                                        Codigo: {{uni.codigo}} Permisionario: {{uni.permisionarioText}}
                                     </v-list-item-subtitle>
                                 </v-list-item-content>
                                 <v-list-item-action>
-                                    <v-btn fab @click="llenarDatos(unidad)" >
+                                    <v-btn fab @click="unidad = uni; accion= 'Modificar'; edit=true" >
                                         <v-icon>
                                             mdi-pencil
                                         </v-icon>
@@ -51,6 +51,18 @@
                 <v-card-actions>
                     <v-btn @click="agregarUnidad(accion)" color="success" >Agregar</v-btn>
                     <v-btn @click="modal=false; limpiar() " color="error" >Cancelar</v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+        <v-dialog v-model="edit" max-width="400">
+            <v-card>
+                <v-card-title>{{accion}}</v-card-title>
+                <v-card-text>
+                    <v-select v-model="unidad.permisionario" label="Permisionario" :items="permisionarios" item-text="nombre" item-value="clave" ></v-select>
+                </v-card-text>
+                <v-card-actions>
+                    <v-btn @click="agregarUnidad(accion)" color="success" >Cambiar</v-btn>
+                    <v-btn @click="edit=false; limpiar() " color="error" >Cancelar</v-btn>
                 </v-card-actions>
             </v-card>
         </v-dialog>
@@ -91,8 +103,10 @@ export default {
         unidad: {
             nombre: "",
             codigo: "",
-            permisionario: ""
-        }
+            permisionario: "",
+            permisionarioText: ""
+        },
+        edit: false
     }),
     computed:{
         ...mapGetters({
@@ -107,7 +121,8 @@ export default {
         ...mapActions({
             traerUnidades: 'cajeras/getAllUnidadesServer',
             traerPermisionarios: 'cajeras/getAllPermisionarios',
-            addUnidad: 'admin/addUnidad'
+            addUnidad: 'admin/addUnidad',
+            change: 'admin/changeUnidad'
         }),
         limpiar(){
             this.unidad = {
@@ -116,18 +131,21 @@ export default {
                 permisionario: ""
             }
         },
+        ver(){
+            console.log(this.unidad);
+        },
         async agregarUnidad(accion){
             this.loader = true
             this.modal = false
             if(accion == "Agregar"){
                 if(this.unidad.nombre!="" && this.unidad.codigo!="" && this.unidad.permisionario!="" ){
                     if(await this.addUnidad(this.unidad)){
-                        this.mensaje = "Unidad Añadido con éxito"
+                        this.mensaje = "Unidad Añadida con éxito"
                         this.loader = false
                         this.limpiar()        
                         this.succes = true
                     }else{
-                        this.mensaje= "Error al añadir al usuario"
+                        this.mensaje= "Error al añadir la unidad"
                         this.loader = false
                         this.succes = true
                     }
@@ -137,15 +155,15 @@ export default {
                     this.succes = true
                 }
             }else if(accion == "Modificar"){
-                if(this.usuario.nombre!="" && this.usuario.codigo!="" && this.usuario.permisionario!=""){
-                    if(this.addUnidadr(this.usuario)){
-                        this.mensaje = "Usuario Añadido con éxito"
-                        this.modal = false
+                if(this.unidad.nombre!="" && this.unidad.codigo!="" && this.unidad.permisionario!=""){
+                    if(await this.change(this.unidad)){
+                        this.mensaje = "Unidad cambiada con exito"
                         this.loader = false
+                        this.edit = false
                         this.limpiar()        
                         this.succes = true
                     }else{
-                        this.mensaje= "Error al añadir al usuario"
+                        this.mensaje= "Error al cambiar la unidad"
                         this.loader = false
                         this.succes = true
                     }

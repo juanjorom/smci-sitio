@@ -32,8 +32,6 @@
     <v-navigation-drawer v-if="logeado" v-model="mostrar" app clipped>
       <v-list>
         <v-list-item v-for="(ruta, index) in permisos" :key="index"><v-btn text :to="ruta.ruta">{{ruta.modulo}}</v-btn> </v-list-item>
-        <!--<v-list-item><v-btn text to="/caja">Caja</v-btn></v-list-item>
-        <v-list-item><v-btn text to="/boleteras">Boletera</v-btn></v-list-item>-->
       </v-list>
     </v-navigation-drawer>
     <v-main>
@@ -74,9 +72,13 @@ export default {
       traerPermisos: 'appdata/getAccesosServer'
     }),
     action(accion){
-      if(accion=="closeSesion")
-      this.cerrar()
-      this.$router.push('/login')
+      if(accion=="closeSesion"){
+        this.cerrar()
+        this.$router.push('/login')
+      }
+      else if(accion == "changePassword"){
+        this.$router.push('/password')
+      }
     }
   }
 };

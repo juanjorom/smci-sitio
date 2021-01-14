@@ -130,8 +130,22 @@ const actions = {
         state.key = null
         state.user = null
         state.sucess = false
+    },
+    async changePassword({state}, passwords){
+        try{
+            passwords.token = state.key
+            var response = await axios.put(state.host + "/updatePassword", passwords)
+            console.log(response);
+            if(response.data.mensaje == "ok"){
+                return true
+            }
+            else{
+                return false
+            }
+        } catch {
+            return false
+        }
     }
-
 }
 
 

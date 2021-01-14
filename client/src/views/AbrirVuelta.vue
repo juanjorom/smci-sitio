@@ -89,7 +89,7 @@
             <v-card>
                 <v-card-title>Ingrese su contraseña</v-card-title>
                 <v-card-text>
-                    <v-text-field v-model="password" label="Contraseña" placeholder="Contraseña" type="password" @keydown="isEnter($event)"></v-text-field>
+                    <v-text-field autofocus v-model="password" label="Contraseña" placeholder="Contraseña" type="password" @keydown="isEnter($event)"></v-text-field>
                 </v-card-text>
                 <v-card-actions>
                     <v-btn @click="validarPassword">Ok</v-btn>

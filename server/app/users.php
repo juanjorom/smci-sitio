@@ -157,14 +157,48 @@
      */
     function update_password($data)
     {
-        if(!validar_parametros_option($data, ["token", "password"],2))
+        if(!validar_parametros_option($data, ["token", "actual", "nueva", "confirmar"],4))
         {
             return Array("mensaje" => "error");
         }
         $validacion = validar_token($data->token);
         if($validacion)
         {
-            $actualizar = $GLOBALS["DB"]->ejecutar_consulta("UPDATE usuario_usuarios SET USUARIOS_PASSWORD = '{$data->password}', USUARIOS_PASSWORD_HISTORIAL = 1 WHERE USUARIOS_ID = {$validacion['id']}");
+            $consulta = $GLOBALS["DB"]->ejecutar_consulta("SELECT USUARIOS_PASSWORD FROM usuario_usuarios WHERE USUARIOS_ID = {$validacion['id']}");
+            if(compare_passwords($data->actual, $consulta["USUARIOS_PASSWORD"]))
+            {
+                if($data->nueva == $data->confirmar)
+                {
+                    $password = create_password($data->nueva);
+                    $actualizar = $GLOBALS["DB"]->ejecutar_consulta("UPDATE usuario_usuarios SET USUARIOS_PASSWORD = '{$password}', USUARIOS_PASSWORD_HISTORIAL = 1 WHERE USUARIOS_ID = {$validacion['id']}");
+                    if($actualizar)
+                    {
+                        return Array("mensaje" => "ok");
+                    }
+                }
+            }
+        }
+        return Array("mensaje" => "error");
+    }
+
+    /**
+     * Funcion para actualizar la contraseña desde el administrador
+     * 
+     * @param Object $data Los datos de la peticion
+     * @return Array Un arreglo con la información solicitada
+     * @author Juanjo Romero
+     */
+    function update_password_admin($data)
+    {
+        if(!validar_parametros_option($data, ["token", "user", "password"],3))
+        {
+            return Array("mensaje" => "error");
+        }
+        $validacion = validar_token($data->token);
+        if($validacion)
+        {
+            $password = create_password($data->password);
+            $actualizar = $GLOBALS["DB"]->ejecutar_consulta("UPDATE usuario_usuarios SET USUARIOS_PASSWORD = '{$password}', USUARIOS_PASSWORD_HISTORIAL = 0 WHERE USUARIOS_ID = {$data->user}");
             if($actualizar)
             {
                 return Array("mensaje" => "ok");
@@ -279,7 +313,7 @@
         $validacion = validar_token($token);
         if($validacion)
         {
-            $tipo = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT ROL_ID AS id, ROL_DESCRIPCION AS rol FROM usuario_rol");
+            $tipo = $GLOBALS["DB"]->ejecutar_consulta_multiple("SELECT ROL_ID AS id, ROL_DESCRIPCION AS rol FROM usuario_rol WHERE ROL_ID > 1");
             if($tipo)
             {
                 $arreglo = Array();
