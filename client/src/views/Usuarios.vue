@@ -16,9 +16,9 @@
                                     </v-list-item-subtitle>
                                 </v-list-item-content>
                                 <v-list-item-action>
-                                    <v-btn fab @click="llenarDatos(usuario)" >
+                                    <v-btn fab @click="llenarDatos(usuario); accion='Password'" >
                                         <v-icon>
-                                            mdi-pencil
+                                            mdi-key
                                         </v-icon>
                                     </v-btn>
                                 </v-list-item-action>
@@ -110,7 +110,8 @@ export default {
         ...mapActions({
             traerUsuarios: 'admin/getUsuariosServer',
             traerRoles: 'admin/getRolesServer',
-            addUser: 'admin/addUser'
+            addUser: 'admin/addUser',
+            cambiar: 'admin/changePassword'
         }),
         llenarDatos(usuario){
             this.usuario = usuario
@@ -146,14 +147,14 @@ export default {
                 }
             }else if(accion == "Password"){
                 if(this.usuario.nickname!="" && this.usuario.password!=""){
-                    if(this.addUser(this.usuario)){
-                        this.mensaje = "Usuario Añadido con éxito"
+                    if(await this.cambiar({user: this.usuario.nickname, password: this.usuario.password})){
+                        this.mensaje = "Contraseña cambiara"
                         this.modal = false
                         this.loader = false
                         this.limpiar()        
                         this.succes = true
                     }else{
-                        this.mensaje= "Error al añadir al usuario"
+                        this.mensaje= "Error al cambiar al contraseña"
                         this.loader = false
                         this.succes = true
                     }

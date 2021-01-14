@@ -135,7 +135,7 @@ const actions = {
     async changePassword({rootState}, usuario){
         try{
             usuario.token = rootState.logdata.key
-            var peticion = await axios.put(rootState.logdata.host + "/getModulos", usuario)
+            var peticion = await axios.put(rootState.logdata.host + "/changePassword", usuario)
             if(peticion.data.mensaje == "ok"){
                 return true
             }else{

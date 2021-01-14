@@ -198,7 +198,7 @@
         if($validacion)
         {
             $password = create_password($data->password);
-            $actualizar = $GLOBALS["DB"]->ejecutar_consulta("UPDATE usuario_usuarios SET USUARIOS_PASSWORD = '{$password}', USUARIOS_PASSWORD_HISTORIAL = 0 WHERE USUARIOS_ID = {$data->user}");
+            $actualizar = $GLOBALS["DB"]->ejecutar_consulta("UPDATE usuario_usuarios SET USUARIOS_PASSWORD = '{$password}', USUARIOS_PASSWORD_HISTORIAL = 0 WHERE USUARIOS_NICKNAME = '{$data->user}'");
             if($actualizar)
             {
                 return Array("mensaje" => "ok");
