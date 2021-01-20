@@ -25,6 +25,10 @@ import MovimientosHome from '@/views/MovimientosHome'
 import ingresarPago from '@/views/ingresarPago'
 import Password from '@/views/Password'
 import Historial from '@/views/Historial'
+import Reportes from '@/views/Reportes'
+
+import reporteVueltas from '@/components/reporteVueltas'
+import reporteVentas from '@/components/reporteVentas'
 
 Vue.use(Router)
 
@@ -197,6 +201,24 @@ const routes= [
         path: '/password',
         name: 'password',
         component: Password
+    },
+    {
+        path: '/reporteVueltas',
+        name: 'reporteVueltas',
+        component: reporteVueltas
+    },
+    {
+        path: '/reporteVentas',
+        name: 'reporteVentas',
+        component: reporteVentas
+    },
+    {
+        path: '/reportes',
+        name: 'reportes',
+        component: Reportes,
+        children: [
+            
+        ]
     },
     {
         path: '*',

@@ -71,9 +71,9 @@ export default {
       cerrar: 'logdata/closeSesion',
       traerPermisos: 'appdata/getAccesosServer'
     }),
-    action(accion){
+    async action(accion){
       if(accion=="closeSesion"){
-        this.cerrar()
+        await this.cerrar()
         this.$router.push('/login')
       }
       else if(accion == "changePassword"){

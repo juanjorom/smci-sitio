@@ -130,6 +130,12 @@
                 case "getVueltas":
                     $RESPUESTA = get_vueltas_closed($_GET["token"], $_GET["inicio"], $_GET["fin"]);
                 break;
+                case "getReportes":
+                    $RESPUESTA = get_reportes($_GET["token"]);
+                break;
+                case "getVentas":
+                    $RESPUESTA = get_ventas_fecha($_GET["token"],$_GET["inicio"],$_GET["fin"], $_GET["filtro"]);
+                break;
                 default;
                     $RESPUESTA= Array("mensaje" => "Recurso no existe");
                 break;
